@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
 import com.vovan.diplomaapp.R
-import com.vovan.diplomaapp.TitleFragmentDirections
+import com.vovan.diplomaapp.presentation.TitleFragmentDirections
 import com.vovan.diplomaapp.databinding.FragmentTitleBinding
 
 

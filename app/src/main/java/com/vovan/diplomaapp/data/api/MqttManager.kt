@@ -7,13 +7,14 @@ import com.amazonaws.mobileconnectors.iot.AWSIotMqttManager
 import com.amazonaws.mobileconnectors.iot.AWSIotMqttQos
 import com.amazonaws.regions.Regions
 import com.google.gson.Gson
+import io.reactivex.Completable
 import io.reactivex.Observable
 import timber.log.Timber
 import java.io.UnsupportedEncodingException
 import java.util.*
 
-private const val CUSTOMER_SPECIFIC_ENDPOINT = "<Secret Data>"
-private const val COGNITO_POOL_ID = "<Secret Data>"
+private const val CUSTOMER_SPECIFIC_ENDPOINT = "<Secret data>"
+private const val COGNITO_POOL_ID = "<Secret data>"
 
 class MqttManager(private val context: Context) {
     val gson = Gson()
@@ -40,7 +41,7 @@ class MqttManager(private val context: Context) {
 
     /*
         Connection to AWS IoT Core Broker
-        return Observable<AwsConnectionState>
+        @return Observable<AwsConnectionState>
     */
     fun connect(): Observable<AwsConnectionState> {
         Timber.d("Connection to AWS")
@@ -66,7 +67,7 @@ class MqttManager(private val context: Context) {
         Subscribe to AWS IoT Core topic
         @param topic
             name of topic
-        return Observable<Any>
+        @return Observable<Any>
     */
     inline fun <reified T: Any> subscribe(topic: String): Observable<T> {
         return Observable.create{ subscriber ->
@@ -93,22 +94,25 @@ class MqttManager(private val context: Context) {
         Publishing to AWS IoT Core Broker
         @param topic
             name of topic
-        @param callback AwsIotMqtt callback
-            which defines in viewModel and gets respond about connection
-
+        @param message
+            object in json
+        @return Completable (RxJava object)
      */
-    fun publish(topic: String, message: String) {
-        try {
-            manager.publishString(message, topic, AWSIotMqttQos.QOS0)
-        } catch (e: Throwable) {
-            Timber.e(e)
+    fun publish(topic: String, message: String): Completable {
+        return Completable.create { subscriber ->
+            try {
+                manager.publishString(message, topic, AWSIotMqttQos.QOS0)
+                subscriber.onComplete()
+            } catch (e: Throwable) {
+                subscriber.onError(e)
+                Timber.e(e)
+            }
         }
     }
 
 
     /*
         Disconnect from AWS IoT Core Broker
-
     */
     fun disconnect() {
         manager.disconnect()
@@ -116,6 +120,9 @@ class MqttManager(private val context: Context) {
 
 }
 
+/*
+    Aws connection states
+ */
 sealed class AwsConnectionState {
     object Connecting : AwsConnectionState()
     object Connected : AwsConnectionState()

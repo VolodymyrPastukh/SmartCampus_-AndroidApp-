@@ -1,14 +1,17 @@
 package com.vovan.diplomaapp.presentation.ledController
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
+import com.google.android.material.snackbar.Snackbar
 import com.vovan.diplomaapp.R
 import com.vovan.diplomaapp.databinding.FragmentLedControllerBinding
 
@@ -43,14 +46,37 @@ class LedControllerFragment : Fragment() {
         }
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
-            if (state is LedControllerViewState.Data) {
-                setColors(state.data)
-            }
+            displayData(state)
         }
 
 
 
         return binding.root
+    }
+
+
+    private fun displayData(state: LedControllerViewState){
+        when(state){
+            is LedControllerViewState.Connecting -> {
+                binding.progressBar.show()
+                binding.progressBar.setIndicatorColor(Color.BLACK)
+                binding.progressBar.isIndeterminate = true
+            }
+
+            is LedControllerViewState.Connected -> {
+                Snackbar.make(
+                    requireActivity().findViewById(android.R.id.content),
+                    getString(R.string.Connected),
+                    Snackbar.LENGTH_SHORT // How long to display the message.
+                ).show()
+                binding.progressBar.hide()
+            }
+
+            is LedControllerViewState.Data -> setColors(state.data)
+
+            is LedControllerViewState.Error ->
+                Toast.makeText(context, "Error ${state.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setColors(data: List<Boolean>) {
