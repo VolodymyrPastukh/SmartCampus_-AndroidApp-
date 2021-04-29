@@ -24,6 +24,14 @@ class SensorsViewModel(application: Application) : AndroidViewModel(application)
         connect()
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        mqttManager.disconnect()
+    }
+
+    /*
+        Function makes connection to AWS IoT Core Broker
+     */
     private fun connect(){
         val dispose = mqttManager.connect()
             .subscribeOn(Schedulers.newThread())
@@ -31,6 +39,9 @@ class SensorsViewModel(application: Application) : AndroidViewModel(application)
             .subscribe { next -> defineConnectionState(next) }
     }
 
+    /*
+        Function subscribes on data from IoT devices on topic
+     */
     private fun subscribe(){
         val dispose = mqttManager.subscribe<SensorsEntity>("esp32/pub")
             .subscribeOn(Schedulers.newThread())
@@ -38,6 +49,9 @@ class SensorsViewModel(application: Application) : AndroidViewModel(application)
             .subscribe { data -> showData(data) }
     }
 
+    /*
+        Function defines AWS Connection state
+     */
     private fun defineConnectionState(connectionState: AwsConnectionState){
         when(connectionState){
             AwsConnectionState.Connecting -> _state.value = SensorsViewState.Connecting
@@ -53,10 +67,5 @@ class SensorsViewModel(application: Application) : AndroidViewModel(application)
         _state.value = SensorsViewState.Data(data)
     }
 
-
-    override fun onCleared() {
-        super.onCleared()
-        mqttManager.disconnect()
-    }
 
 }

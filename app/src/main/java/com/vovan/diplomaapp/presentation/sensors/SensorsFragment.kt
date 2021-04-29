@@ -49,14 +49,12 @@ class SensorsFragment : Fragment() {
     private fun displayData(state: SensorsViewState){
         when(state){
             is SensorsViewState.Connecting -> {
-                Toast.makeText(context, "F - Connecting...", Toast.LENGTH_SHORT).show()
                 binding.progressBar.show()
                 binding.progressBar.setIndicatorColor(Color.BLACK)
                 binding.progressBar.isIndeterminate = true
             }
 
             is SensorsViewState.Connected -> {
-                Toast.makeText(context, "F - Connecting...", Toast.LENGTH_SHORT).show()
                 Snackbar.make(
                     requireActivity().findViewById(android.R.id.content),
                     getString(R.string.Connected),
@@ -67,7 +65,8 @@ class SensorsFragment : Fragment() {
 
             is SensorsViewState.Data -> setFields(state.data)
 
-            is SensorsViewState.Error -> Toast.makeText(context, "Error: ${state.message}", Toast.LENGTH_LONG).show()
+            is SensorsViewState.Error ->
+                Toast.makeText(context, "Error: ${state.message}", Toast.LENGTH_LONG).show()
         }
     }
 

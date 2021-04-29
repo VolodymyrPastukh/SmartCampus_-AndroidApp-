@@ -1,7 +1,5 @@
 package com.vovan.diplomaapp.presentation.ledController
 
-import com.vovan.diplomaapp.entity.LedControllerEntity
-
 sealed class LedControllerViewState {
     object Connecting: LedControllerViewState()
     object Connected: LedControllerViewState()

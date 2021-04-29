@@ -25,8 +25,13 @@ class LedControllerViewModel(application: Application) : AndroidViewModel(applic
         connect()
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        mqttManager.disconnect()
+    }
+
     /*
-        Function makes connect with AWS IoT Core Broker
+        Function makes connection to AWS IoT Core Broker
      */
     private fun connect() {
         val dispose = mqttManager.connect()
