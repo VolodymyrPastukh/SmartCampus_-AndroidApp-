@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">DiplomaApp</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="Connected">Connected!</string>
+    <string name="Time">Time</string>
+    <string name="temperature">Temperature</string>
+    <string name="light">Light</string>
+    <string name="smart_campus">Smart Campus</string>
+</resources>
