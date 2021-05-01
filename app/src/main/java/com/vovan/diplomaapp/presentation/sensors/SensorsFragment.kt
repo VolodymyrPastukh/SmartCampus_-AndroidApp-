@@ -9,12 +9,10 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.observe
 import com.google.android.material.snackbar.Snackbar
 import com.vovan.diplomaapp.R
 import com.vovan.diplomaapp.databinding.FragmentSensorsBinding
-import com.vovan.diplomaapp.entity.SensorsEntity
-import timber.log.Timber
+import com.vovan.diplomaapp.domain.entity.SensorsEntity
 
 
 class SensorsFragment : Fragment() {

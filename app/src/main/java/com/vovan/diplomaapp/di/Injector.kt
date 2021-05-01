@@ -1,8 +1,12 @@
 package com.vovan.diplomaapp.di
 
+import android.app.Application
 import android.content.Context
+import com.vovan.diplomaapp.data.NetworkCampusRepository
 import com.vovan.diplomaapp.data.api.MqttManager
 
 object Injector {
-    fun getMqttManager(context: Context): MqttManager = MqttManager(context)
+    fun provideRepository(context: Context) = NetworkCampusRepository(
+        api = MqttManager(context)
+    )
 }

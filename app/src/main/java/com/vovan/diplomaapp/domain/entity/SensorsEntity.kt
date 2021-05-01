@@ -1,4 +1,4 @@
-package com.vovan.diplomaapp.entity
+package com.vovan.diplomaapp.domain.entity
 
 data class SensorsEntity(
     val time: String,

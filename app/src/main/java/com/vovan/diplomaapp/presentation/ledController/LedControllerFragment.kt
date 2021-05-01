@@ -2,15 +2,13 @@ package com.vovan.diplomaapp.presentation.ledController
 
 import android.graphics.Color
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewPropertyAnimator
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.observe
 import com.google.android.material.snackbar.Snackbar
 import com.vovan.diplomaapp.R
 import com.vovan.diplomaapp.databinding.FragmentLedControllerBinding

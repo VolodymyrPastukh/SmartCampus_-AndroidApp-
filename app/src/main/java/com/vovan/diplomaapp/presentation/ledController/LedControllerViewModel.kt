@@ -5,17 +5,22 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
-import com.vovan.diplomaapp.data.api.AwsConnectionState
-import com.vovan.diplomaapp.data.api.MqttManager
+import com.vovan.diplomaapp.data.NetworkCampusRepository
 import com.vovan.diplomaapp.di.Injector
-import com.vovan.diplomaapp.entity.LedControllerEntity
+import com.vovan.diplomaapp.domain.entity.ConnectionState
+import com.vovan.diplomaapp.domain.entity.LedControllerEntity
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 
 class LedControllerViewModel(application: Application) : AndroidViewModel(application) {
 
     private val gson = Gson()
-    private var mqttManager: MqttManager = Injector.getMqttManager(application.applicationContext)
+    private val repository: NetworkCampusRepository =
+        Injector.provideRepository(application.applicationContext)
+
+    private var disposable: Disposable? = null
 
     private val _state = MutableLiveData<LedControllerViewState>()
     val state: LiveData<LedControllerViewState>
@@ -27,29 +32,33 @@ class LedControllerViewModel(application: Application) : AndroidViewModel(applic
 
     override fun onCleared() {
         super.onCleared()
-        mqttManager.disconnect()
+        repository.disconnect()
+        disposable?.dispose()
     }
 
     /*
         Function makes connection to AWS IoT Core Broker
      */
     private fun connect() {
-        val dispose = mqttManager.connect()
+        disposable = repository.connect()
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { next -> defineConnectionState(next) }
+            .subscribe (
+                { next -> defineConnectionState(next) },
+                { throwable -> Timber.e(throwable) }
+            )
     }
 
     /*
         Function publishes data (RGB state) to remote devices
      */
-    private fun publish(topic: String, message: String) {
-        val dispose = mqttManager.publish(topic, message)
+    private fun publish(message: String) {
+        disposable = repository.publish(TOPIC_PUB, message)
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { _state.value = LedControllerViewState.Data(Rgb.getState()) },
-                { error -> _state.value = LedControllerViewState.Error(error.message ?: "Some Unknown Error")}
+                { throwable -> Timber.e(throwable) }
             )
     }
 
@@ -63,25 +72,23 @@ class LedControllerViewModel(application: Application) : AndroidViewModel(applic
             Rgb.setColor(color)
         )
 
+        //Turn on buzzer if each color is active
         if (led.rgb == 7) led.buzzer = 1
         else led.buzzer = 0
 
         val message = gson.toJson(led)
-        publish("esp32/sub", message)
+        publish(message)
     }
 
 
     /*
         Function defines and processes AWS Connection state
      */
-    private fun defineConnectionState(connectionState: AwsConnectionState) {
+    private fun defineConnectionState(connectionState: ConnectionState) {
         when (connectionState) {
-            AwsConnectionState.Connecting -> _state.value = LedControllerViewState.Connecting
-            AwsConnectionState.Connected -> {
-                _state.value = LedControllerViewState.Connected
-            }
-            AwsConnectionState.Disconnect -> _state.value =
-                LedControllerViewState.Error("Disconnect")
+            ConnectionState.Connecting -> _state.value = LedControllerViewState.Connecting
+            ConnectionState.Connected -> _state.value = LedControllerViewState.Connected
+            ConnectionState.Disconnect -> _state.value = LedControllerViewState.Error("Disconnect")
         }
     }
 
@@ -118,10 +125,11 @@ class LedControllerViewModel(application: Application) : AndroidViewModel(applic
         }
 
         fun getState(): List<Boolean> = listOf(red, green, blue)
-
     }
 
     companion object {
+        const val TOPIC_PUB = "esp32/sub"
+
         const val RED_LED = "red"
         const val GREEN_LED = "green"
         const val BLUE_LED = "blue"

@@ -4,16 +4,21 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.vovan.diplomaapp.data.api.AwsConnectionState
-import com.vovan.diplomaapp.data.api.MqttManager
+import com.vovan.diplomaapp.data.NetworkCampusRepository
 import com.vovan.diplomaapp.di.Injector
-import com.vovan.diplomaapp.entity.SensorsEntity
+import com.vovan.diplomaapp.domain.entity.ConnectionState
+import com.vovan.diplomaapp.domain.entity.SensorsEntity
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 
 class SensorsViewModel(application: Application) : AndroidViewModel(application) {
 
-    private var mqttManager: MqttManager = Injector.getMqttManager(application.applicationContext)
+    private val repository: NetworkCampusRepository =
+        Injector.provideRepository(application.applicationContext)
+
+    private var disposable: Disposable? = null
 
     private val _state = MutableLiveData<SensorsViewState>()
     val state: LiveData<SensorsViewState>
@@ -26,46 +31,56 @@ class SensorsViewModel(application: Application) : AndroidViewModel(application)
 
     override fun onCleared() {
         super.onCleared()
-        mqttManager.disconnect()
+        repository.disconnect()
+        disposable?.dispose()
     }
 
     /*
         Function makes connection to AWS IoT Core Broker
      */
-    private fun connect(){
-        val dispose = mqttManager.connect()
+    private fun connect() {
+        disposable = repository.connect()
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { next -> defineConnectionState(next) }
+            .subscribe(
+                { status -> defineConnectionState(status) },
+                { throwable -> Timber.e(throwable) }
+            )
     }
 
     /*
         Function subscribes on data from IoT devices on topic
      */
-    private fun subscribe(){
-        val dispose = mqttManager.subscribe<SensorsEntity>("esp32/pub")
+    private fun subscribe() {
+        disposable = repository.subscribe(TOPIC_SUB)
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { data -> showData(data) }
+            .subscribe(
+                { data -> showData(data) },
+                { throwable -> Timber.e(throwable) }
+            )
     }
 
     /*
         Function defines AWS Connection state
      */
-    private fun defineConnectionState(connectionState: AwsConnectionState){
-        when(connectionState){
-            AwsConnectionState.Connecting -> _state.value = SensorsViewState.Connecting
-            AwsConnectionState.Connected ->{
+    private fun defineConnectionState(connectionState: ConnectionState) {
+        when (connectionState) {
+            ConnectionState.Connecting -> _state.value = SensorsViewState.Connecting
+            ConnectionState.Connected -> {
                 _state.value = SensorsViewState.Connected
                 subscribe()
             }
-            AwsConnectionState.Disconnect -> _state.value = SensorsViewState.Error("Disconnect")
+            ConnectionState.Disconnect -> _state.value = SensorsViewState.Error("Disconnect")
         }
     }
 
-    private fun showData(data: SensorsEntity){
+    private fun showData(data: SensorsEntity) {
         _state.value = SensorsViewState.Data(data)
     }
 
+    companion object{
+        const val TOPIC_SUB = "esp32/pub"
+    }
 
 }

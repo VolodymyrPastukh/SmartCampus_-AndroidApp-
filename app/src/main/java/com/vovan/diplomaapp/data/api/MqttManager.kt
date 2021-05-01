@@ -13,17 +13,17 @@ import timber.log.Timber
 import java.io.UnsupportedEncodingException
 import java.util.*
 
-private const val CUSTOMER_SPECIFIC_ENDPOINT = "<Secret data>"
-private const val COGNITO_POOL_ID = "<Secret data>"
+private const val CUSTOMER_SPECIFIC_ENDPOINT = "a240uztzb3wu4b-ats.iot.us-east-2.amazonaws.com"
+private const val COGNITO_POOL_ID = "us-east-2:af05d7dd-66aa-433c-95b8-15fc636f663d"
 
 class MqttManager(private val context: Context) {
-    val gson = Gson()
+
     private val region = Regions.US_EAST_2
     private val clientId = UUID.randomUUID().toString()
     lateinit var credentialsProvider: CognitoCachingCredentialsProvider
 
     private lateinit var _manager: AWSIotMqttManager
-    val manager: AWSIotMqttManager by lazy {
+    private val manager: AWSIotMqttManager by lazy {
         createManager()
         _manager
     }
@@ -43,20 +43,15 @@ class MqttManager(private val context: Context) {
         Connection to AWS IoT Core Broker
         @return Observable<AwsConnectionState>
     */
-    fun connect(): Observable<AwsConnectionState> {
+    fun connect(): Observable<AWSIotMqttClientStatus> {
         Timber.d("Connection to AWS")
         return Observable.create{ subscriber ->
             manager.connect(
                 credentialsProvider
             ) { status, throwable ->
                 Timber.d("Status = $status")
-                when (status) {
-                    AWSIotMqttClientStatus.Connecting -> subscriber.onNext(AwsConnectionState.Connecting)
-                    AWSIotMqttClientStatus.Connected -> subscriber.onNext(AwsConnectionState.Connected)
-                    AWSIotMqttClientStatus.ConnectionLost -> subscriber.onNext(AwsConnectionState.Disconnect)
-                    AWSIotMqttClientStatus.Reconnecting -> subscriber.onNext(AwsConnectionState.Connecting)
-                    else -> Timber.e("ELSE ERROR $throwable")
-                }
+                subscriber.onNext(status)
+                if(throwable != null) subscriber.onError(throwable)
             }
         }
 
@@ -69,19 +64,17 @@ class MqttManager(private val context: Context) {
             name of topic
         @return Observable<Any>
     */
-    inline fun <reified T: Any> subscribe(topic: String): Observable<T> {
+    fun subscribe(topic: String): Observable<String> {
         return Observable.create{ subscriber ->
             manager.subscribeToTopic(
                 topic,
                 AWSIotMqttQos.QOS0
-            ) { _, data ->
+            ) { _, message ->
                 try {
-                    val message = String(data, Charsets.UTF_8)
-                    val sensors = gson.fromJson(message, T::class.java)
-                    subscriber.onNext(sensors)
+                    val data = String(message, Charsets.UTF_8)
+                    subscriber.onNext(data)
 
                 } catch (e: UnsupportedEncodingException) {
-                    Timber.e("Message encoding error. $e")
                     subscriber.onError(e)
                 }
             }
@@ -105,7 +98,6 @@ class MqttManager(private val context: Context) {
                 subscriber.onComplete()
             } catch (e: Throwable) {
                 subscriber.onError(e)
-                Timber.e(e)
             }
         }
     }
@@ -120,11 +112,3 @@ class MqttManager(private val context: Context) {
 
 }
 
-/*
-    Aws connection states
- */
-sealed class AwsConnectionState {
-    object Connecting : AwsConnectionState()
-    object Connected : AwsConnectionState()
-    object Disconnect : AwsConnectionState()
-}

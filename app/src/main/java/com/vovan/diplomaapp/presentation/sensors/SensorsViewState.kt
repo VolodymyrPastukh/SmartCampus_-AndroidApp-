@@ -1,6 +1,6 @@
 package com.vovan.diplomaapp.presentation.sensors
 
-import com.vovan.diplomaapp.entity.SensorsEntity
+import com.vovan.diplomaapp.domain.entity.SensorsEntity
 
 sealed class SensorsViewState {
     object Connecting: SensorsViewState()
