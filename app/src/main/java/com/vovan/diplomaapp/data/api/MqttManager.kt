@@ -13,8 +13,8 @@ import timber.log.Timber
 import java.io.UnsupportedEncodingException
 import java.util.*
 
-private const val CUSTOMER_SPECIFIC_ENDPOINT = "a240uztzb3wu4b-ats.iot.us-east-2.amazonaws.com"
-private const val COGNITO_POOL_ID = "us-east-2:af05d7dd-66aa-433c-95b8-15fc636f663d"
+private const val CUSTOMER_SPECIFIC_ENDPOINT = "<Secret data>"
+private const val COGNITO_POOL_ID = "<Secret data>"
 
 class MqttManager(private val context: Context) {
 
