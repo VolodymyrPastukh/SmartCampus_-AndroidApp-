@@ -17,8 +17,7 @@ private const val CUSTOMER_SPECIFIC_ENDPOINT = "<Secret data>"
 private const val COGNITO_POOL_ID = "<Secret data>"
 
 class MqttManager(private val context: Context) {
-
-    private val region = Regions.US_EAST_2
+    private val region = Regions.EU_WEST_2
     private val clientId = UUID.randomUUID().toString()
     lateinit var credentialsProvider: CognitoCachingCredentialsProvider
 
@@ -27,7 +26,6 @@ class MqttManager(private val context: Context) {
         createManager()
         _manager
     }
-
     private fun createManager() {
         credentialsProvider = CognitoCachingCredentialsProvider(
             context,
@@ -37,8 +35,6 @@ class MqttManager(private val context: Context) {
         val temp = AWSIotMqttManager(clientId, CUSTOMER_SPECIFIC_ENDPOINT)
         _manager = temp
     }
-
-
     /*
         Connection to AWS IoT Core Broker
         @return Observable<AwsConnectionState>
@@ -56,8 +52,6 @@ class MqttManager(private val context: Context) {
         }
 
     }
-
-
     /*
         Subscribe to AWS IoT Core topic
         @param topic
@@ -81,8 +75,6 @@ class MqttManager(private val context: Context) {
         }
 
     }
-
-
     /*
         Publishing to AWS IoT Core Broker
         @param topic
@@ -101,14 +93,11 @@ class MqttManager(private val context: Context) {
             }
         }
     }
-
-
     /*
         Disconnect from AWS IoT Core Broker
     */
     fun disconnect() {
         manager.disconnect()
     }
-
 }
 

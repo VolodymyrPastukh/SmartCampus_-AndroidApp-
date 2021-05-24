@@ -14,27 +14,20 @@ import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
 class SensorsViewModel(application: Application) : AndroidViewModel(application) {
-
     private val repository: NetworkCampusRepository =
         Injector.provideRepository(application.applicationContext)
-
     private var disposable: Disposable? = null
-
     private val _state = MutableLiveData<SensorsViewState>()
     val state: LiveData<SensorsViewState>
         get() = _state
-
-
     init {
         connect()
     }
-
     override fun onCleared() {
         super.onCleared()
         repository.disconnect()
         disposable?.dispose()
     }
-
     /*
         Function makes connection to AWS IoT Core Broker
      */
@@ -47,7 +40,6 @@ class SensorsViewModel(application: Application) : AndroidViewModel(application)
                 { throwable -> Timber.e(throwable) }
             )
     }
-
     /*
         Function subscribes on data from IoT devices on topic
      */
@@ -60,7 +52,6 @@ class SensorsViewModel(application: Application) : AndroidViewModel(application)
                 { throwable -> Timber.e(throwable) }
             )
     }
-
     /*
         Function defines AWS Connection state
      */
@@ -74,7 +65,6 @@ class SensorsViewModel(application: Application) : AndroidViewModel(application)
             ConnectionState.Disconnect -> _state.value = SensorsViewState.Error("Disconnect")
         }
     }
-
     private fun showData(data: SensorsEntity) {
         _state.value = SensorsViewState.Data(data)
     }

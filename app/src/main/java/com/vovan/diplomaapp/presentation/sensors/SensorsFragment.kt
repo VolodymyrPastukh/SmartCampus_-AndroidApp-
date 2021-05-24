@@ -72,6 +72,7 @@ class SensorsFragment : Fragment() {
         binding.date.text = sensors.time
         binding.temperature.text = sensors.temperature.toString()
         binding.light.text = sensors.light.toString()
+        binding.pressure.text = sensors.pressure.toString()
     }
 
 }

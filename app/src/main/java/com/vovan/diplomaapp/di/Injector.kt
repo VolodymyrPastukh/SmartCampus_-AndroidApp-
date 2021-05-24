@@ -1,6 +1,6 @@
 package com.vovan.diplomaapp.di
 
-import android.app.Application
+
 import android.content.Context
 import com.vovan.diplomaapp.data.NetworkCampusRepository
 import com.vovan.diplomaapp.data.api.MqttManager

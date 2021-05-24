@@ -7,4 +7,5 @@
     <string name="temperature">Temperature</string>
     <string name="light">Light</string>
     <string name="smart_campus">Smart Campus</string>
+    <string name="pressure">Pressure</string>
 </resources>

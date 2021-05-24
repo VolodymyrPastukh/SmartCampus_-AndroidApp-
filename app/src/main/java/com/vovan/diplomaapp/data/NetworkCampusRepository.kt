@@ -17,16 +17,12 @@ class NetworkCampusRepository(private val api: MqttManager) : CampusRepository {
             status.toAwsConnectionState()
         }
     }
-
     override fun subscribe(topic: String): Observable<SensorsEntity> {
         return api.subscribe(topic).map { message ->
             gson.fromJson(message, SensorsEntity::class.java)
         }
     }
-
     override fun publish(topic: String, data: String): Completable = api.publish(topic, data)
-
-
     override fun disconnect() {
         api.disconnect()
     }
