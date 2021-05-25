@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.snackbar.Snackbar
 import com.vovan.diplomaapp.R
 import com.vovan.diplomaapp.databinding.FragmentSensorsDataListBinding
 import com.vovan.diplomaapp.presentation.adapter.SensorsAdapter
@@ -35,6 +36,11 @@ class SensorsDataListFragment : Fragment() {
         binding?.let {
             it.recyclerView.adapter = adapter
             it.recyclerView.addItemDecoration(MarginItemDecoration(20))
+
+            it.swipeContainer.setOnRefreshListener {
+                viewModel?.updateData()
+            }
+            it.swipeContainer.setColorSchemeResources(R.color.black);
         }
 
         viewModel = ViewModelProvider(this).get(SensorsDataListViewModel::class.java)
@@ -61,6 +67,14 @@ class SensorsDataListFragment : Fragment() {
             is SensorsDataListViewState.Data -> {
                 adapter?.submitList(state.data)
                 binding?.progressBar?.visibility = ProgressBar.GONE
+                binding?.let{
+                    it.swipeContainer.isRefreshing = false
+                }
+                Snackbar.make(
+                    requireActivity().findViewById(android.R.id.content),
+                    getString(R.string.Updated),
+                    Snackbar.LENGTH_SHORT // How long to display the message.
+                ).show()
             }
             is SensorsDataListViewState.Error ->
                 Toast.makeText(context, "Error: ${state.message}", Toast.LENGTH_LONG).show()

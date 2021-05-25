@@ -52,6 +52,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     implementation 'com.jakewharton.timber:timber:4.7.1'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.5"

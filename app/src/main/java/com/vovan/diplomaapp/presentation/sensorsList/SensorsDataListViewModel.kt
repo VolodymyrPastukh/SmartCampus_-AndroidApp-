@@ -28,6 +28,10 @@ class SensorsDataListViewModel : ViewModel() {
         disposable?.dispose()
     }
 
+    fun updateData(){
+        fetchData()
+    }
+
     private fun fetchData(){
         disposable = api.getSensors()
             .subscribeOn(Schedulers.newThread())
