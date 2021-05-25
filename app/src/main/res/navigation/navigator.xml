@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_titleFragment_to_ledControllerFragment"
             app:destination="@id/ledControllerFragment" />
+        <action
+            android:id="@+id/action_titleFragment_to_sensorsDataList"
+            app:destination="@id/sensorsDataList" />
     </fragment>
     <fragment
         android:id="@+id/dataFragment"
@@ -27,4 +30,9 @@
         android:name="com.vovan.diplomaapp.presentation.ledController.LedControllerFragment"
         android:label="fragment_led_controller"
         tools:layout="@layout/fragment_led_controller" />
+    <fragment
+        android:id="@+id/sensorsDataList"
+        android:name="com.vovan.diplomaapp.presentation.sensorsList.SensorsDataListFragment"
+        android:label="fragment_sensors_data_list"
+        tools:layout="@layout/fragment_sensors_data_list" />
 </navigation>

@@ -33,7 +33,7 @@
             android:id="@+id/sensorsButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="10dp"
             android:background="@color/cardview_shadow_start_color"
             android:text="sensors"
             android:textColor="@color/black"
@@ -46,6 +46,16 @@
             android:layout_marginTop="10dp"
             android:background="@color/cardview_shadow_start_color"
             android:text="Rgb"
+            android:textColor="@color/black"
+            android:textSize="20sp"/>
+
+        <Button
+            android:id="@+id/listButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/cardview_shadow_start_color"
+            android:text="Database"
             android:textColor="@color/black"
             android:textSize="20sp"/>
 

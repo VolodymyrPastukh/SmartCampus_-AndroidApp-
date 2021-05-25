@@ -35,6 +35,12 @@ class TitleFragment : Fragment() {
             findNavController().navigate(TitleFragmentDirections.actionTitleFragmentToLedControllerFragment())
         }
 
+        binding.listButton.setOnClickListener {
+            findNavController().navigate(TitleFragmentDirections.actionTitleFragmentToSensorsDataList())
+        }
+
+
+
         return binding.root
     }
 
