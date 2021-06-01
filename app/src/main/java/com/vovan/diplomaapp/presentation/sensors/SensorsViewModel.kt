@@ -1,33 +1,38 @@
 package com.vovan.diplomaapp.presentation.sensors
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.vovan.diplomaapp.data.NetworkCampusRepository
-import com.vovan.diplomaapp.di.Injector
+import androidx.lifecycle.ViewModel
+import com.vovan.diplomaapp.domain.MqttRepository
 import com.vovan.diplomaapp.domain.entity.ConnectionState
 import com.vovan.diplomaapp.domain.entity.SensorsEntity
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import javax.inject.Inject
 
-class SensorsViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository: NetworkCampusRepository =
-        Injector.provideRepository(application.applicationContext)
+@HiltViewModel
+class SensorsViewModel @Inject constructor(
+    private val repository: MqttRepository,
+) : ViewModel() {
+
     private var disposable: Disposable? = null
     private val _state = MutableLiveData<SensorsViewState>()
     val state: LiveData<SensorsViewState>
         get() = _state
+
     init {
         connect()
     }
+
     override fun onCleared() {
         super.onCleared()
         repository.disconnect()
         disposable?.dispose()
     }
+
     /*
         Function makes connection to AWS IoT Core Broker
      */
@@ -40,6 +45,7 @@ class SensorsViewModel(application: Application) : AndroidViewModel(application)
                 { throwable -> Timber.e(throwable) }
             )
     }
+
     /*
         Function subscribes on data from IoT devices on topic
      */
@@ -52,6 +58,7 @@ class SensorsViewModel(application: Application) : AndroidViewModel(application)
                 { throwable -> Timber.e(throwable) }
             )
     }
+
     /*
         Function defines AWS Connection state
      */
@@ -65,11 +72,12 @@ class SensorsViewModel(application: Application) : AndroidViewModel(application)
             ConnectionState.Disconnect -> _state.value = SensorsViewState.Error("Disconnect")
         }
     }
+
     private fun showData(data: SensorsEntity) {
         _state.value = SensorsViewState.Data(data)
     }
 
-    companion object{
+    companion object {
         const val TOPIC_SUB = "esp32/pub"
     }
 

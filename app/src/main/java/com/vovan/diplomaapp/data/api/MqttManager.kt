@@ -1,3 +1,4 @@
+/*
 package com.vovan.diplomaapp.data.api
 
 import android.content.Context
@@ -35,10 +36,10 @@ class MqttManager(private val context: Context) {
         val temp = AWSIotMqttManager(clientId, CUSTOMER_SPECIFIC_ENDPOINT)
         _manager = temp
     }
-    /*
         Connection to AWS IoT Core Broker
         @return Observable<AwsConnectionState>
-    */
+
+
     fun connect(): Observable<AWSIotMqttClientStatus> {
         Timber.d("Connection to AWS")
         return Observable.create{ subscriber ->
@@ -52,12 +53,12 @@ class MqttManager(private val context: Context) {
         }
 
     }
-    /*
         Subscribe to AWS IoT Core topic
         @param topic
             name of topic
         @return Observable<Any>
-    */
+
+
     fun subscribe(topic: String): Observable<String> {
         return Observable.create{ subscriber ->
             manager.subscribeToTopic(
@@ -75,14 +76,14 @@ class MqttManager(private val context: Context) {
         }
 
     }
-    /*
         Publishing to AWS IoT Core Broker
         @param topic
             name of topic
         @param message
             object in json
         @return Completable (RxJava object)
-     */
+
+
     fun publish(topic: String, message: String): Completable {
         return Completable.create { subscriber ->
             try {
@@ -93,11 +94,12 @@ class MqttManager(private val context: Context) {
             }
         }
     }
-    /*
         Disconnect from AWS IoT Core Broker
-    */
+
+
     fun disconnect() {
         manager.disconnect()
     }
 }
 
+*/

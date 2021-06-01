@@ -42,16 +42,14 @@ class SensorsDataListFragment : Fragment() {
             it.recyclerView.addItemDecoration(MarginItemDecoration(20))
 
             it.swipeContainer.setOnRefreshListener {
-                viewModel?.updateData()
+                viewModel.updateData()
             }
             it.swipeContainer.setColorSchemeResources(R.color.black);
         }
 
 
-        viewModel.let {
-            it.state.observe(viewLifecycleOwner) { state ->
+        viewModel.state.observe(viewLifecycleOwner) { state ->
                 displayData(state)
-            }
         }
 
         return binding?.root

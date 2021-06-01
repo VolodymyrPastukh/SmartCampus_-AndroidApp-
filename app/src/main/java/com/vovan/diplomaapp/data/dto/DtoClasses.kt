@@ -5,6 +5,7 @@ data class ItemsSensorsDTO(
     val Count: Int,
     val ScannedCount: Int
 )
+
 data class SensorsDTO(
     val time: String,
     val device: String,

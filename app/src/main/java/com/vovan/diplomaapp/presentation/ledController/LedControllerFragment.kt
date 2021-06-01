@@ -8,28 +8,29 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.vovan.diplomaapp.R
 import com.vovan.diplomaapp.databinding.FragmentLedControllerBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class LedControllerFragment : Fragment() {
 
-    private lateinit var viewModel: LedControllerViewModel
+    private val viewModel: LedControllerViewModel by viewModels()
     private lateinit var binding: FragmentLedControllerBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_led_controller,
             container,
             false
         )
-        viewModel = ViewModelProvider(this).get(LedControllerViewModel::class.java)
-
 
         binding.redLed.setOnClickListener {
             viewModel.turnOnLed(LedControllerViewModel.RED_LED)

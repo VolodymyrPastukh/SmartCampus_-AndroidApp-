@@ -8,31 +8,31 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.vovan.diplomaapp.R
 import com.vovan.diplomaapp.databinding.FragmentSensorsBinding
 import com.vovan.diplomaapp.domain.entity.SensorsEntity
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class SensorsFragment : Fragment() {
 
-    private lateinit var viewModel: SensorsViewModel
+    private val viewModel: SensorsViewModel by viewModels()
     private lateinit var binding: FragmentSensorsBinding
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_sensors,
             container,
             false
         )
-
-        viewModel = ViewModelProvider(this).get(SensorsViewModel::class.java)
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             displayData(state)

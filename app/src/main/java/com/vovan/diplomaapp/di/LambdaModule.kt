@@ -29,7 +29,7 @@ object LambdaModule {
     }
 
     @Provides
-    fun provideRepository(api: LambdaApi): SensorsRepository {
+    fun provideLambdaRepository(api: LambdaApi): SensorsRepository {
         return LambdaSensorsRepository(api)
     }
 }

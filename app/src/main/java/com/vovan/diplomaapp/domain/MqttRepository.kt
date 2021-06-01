@@ -5,7 +5,7 @@ import com.vovan.diplomaapp.domain.entity.SensorsEntity
 import io.reactivex.Completable
 import io.reactivex.Observable
 
-interface CampusRepository {
+interface MqttRepository {
     fun connect(): Observable<ConnectionState>
     fun subscribe(topic: String): Observable<SensorsEntity>
     fun publish(topic: String, data: String): Completable

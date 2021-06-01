@@ -3,7 +3,6 @@ package com.vovan.diplomaapp.presentation.sensorsList
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.vovan.diplomaapp.di.Injector
 import com.vovan.diplomaapp.domain.SensorsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -13,7 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SensorsDataListViewModel @Inject constructor(
-    val api: SensorsRepository
+    private val api: SensorsRepository
 ) : ViewModel() {
 
     private var disposable: Disposable? = null
