@@ -9,18 +9,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-
-fun createLambdaApi(): LambdaApi {
-    val retrofit = Retrofit.Builder()
-        .baseUrl("https://2op9csyc6c.execute-api.eu-west-2.amazonaws.com/default/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-        .build()
-
-    return retrofit.create(LambdaApi::class.java)
-}
-
-
 interface LambdaApi{
     @GET("SmartCampusHTTPReadDatabase")
     fun fetchSensorsDataToday(

@@ -1,11 +1,13 @@
 package com.vovan.diplomaapp.presentation
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.vovan.diplomaapp.BuildConfig
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.library.BuildConfig
 import com.vovan.diplomaapp.R
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -5,14 +5,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vovan.diplomaapp.di.Injector
 import com.vovan.diplomaapp.domain.SensorsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
-class SensorsDataListViewModel : ViewModel() {
+@HiltViewModel
+class SensorsDataListViewModel @Inject constructor(
+    val api: SensorsRepository
+) : ViewModel() {
 
     private var disposable: Disposable? = null
-    private val api: SensorsRepository = Injector.provideRepository()
 
     private var _state = MutableLiveData<SensorsDataListViewState>()
     val state: LiveData<SensorsDataListViewState>
@@ -28,17 +32,20 @@ class SensorsDataListViewModel : ViewModel() {
         disposable?.dispose()
     }
 
-    fun updateData(){
+    fun updateData() {
         fetchData()
     }
 
-    private fun fetchData(){
+    private fun fetchData() {
         disposable = api.getSensors()
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe (
-                { listSensors -> _state.value = SensorsDataListViewState.Data(listSensors)},
-                { error -> _state.value = SensorsDataListViewState.Error(error.message ?: "Unknown Error (null)")}
+            .subscribe(
+                { listSensors -> _state.value = SensorsDataListViewState.Data(listSensors) },
+                { error ->
+                    _state.value =
+                        SensorsDataListViewState.Error(error.message ?: "Unknown Error (null)")
+                }
             )
     }
 }

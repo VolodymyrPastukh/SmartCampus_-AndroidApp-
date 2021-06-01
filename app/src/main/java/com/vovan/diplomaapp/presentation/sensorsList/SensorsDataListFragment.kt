@@ -9,17 +9,21 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.vovan.diplomaapp.R
 import com.vovan.diplomaapp.databinding.FragmentSensorsDataListBinding
 import com.vovan.diplomaapp.presentation.adapter.SensorsAdapter
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class SensorsDataListFragment : Fragment() {
     private var adapter: SensorsAdapter? = null
     private var binding: FragmentSensorsDataListBinding? = null
-    private var viewModel: SensorsDataListViewModel? = null
+
+    private val viewModel: SensorsDataListViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,8 +47,8 @@ class SensorsDataListFragment : Fragment() {
             it.swipeContainer.setColorSchemeResources(R.color.black);
         }
 
-        viewModel = ViewModelProvider(this).get(SensorsDataListViewModel::class.java)
-        viewModel?.let {
+
+        viewModel.let {
             it.state.observe(viewLifecycleOwner) { state ->
                 displayData(state)
             }
