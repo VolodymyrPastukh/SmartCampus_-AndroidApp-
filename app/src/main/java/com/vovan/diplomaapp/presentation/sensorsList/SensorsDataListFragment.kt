@@ -36,13 +36,18 @@ class SensorsDataListFragment : Fragment() {
             false
         )
 
+
         adapter = SensorsAdapter()
         binding?.let {
             it.recyclerView.adapter = adapter
             it.recyclerView.addItemDecoration(MarginItemDecoration(20))
 
             it.swipeContainer.setOnRefreshListener {
-                viewModel.updateData()
+                update(it.switcher.isChecked)
+            }
+
+            it.switcher.setOnCheckedChangeListener{ _, isChecked ->
+                update(isChecked)
             }
             it.swipeContainer.setColorSchemeResources(R.color.black);
         }
@@ -80,6 +85,14 @@ class SensorsDataListFragment : Fragment() {
             }
             is SensorsDataListViewState.Error ->
                 Toast.makeText(context, "Error: ${state.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun update(tableState: Boolean){
+        if(tableState){
+            viewModel.updateData(SensorsDataListViewModel.DAILY)
+        }else{
+            viewModel.updateData(SensorsDataListViewModel.TODAY)
         }
     }
 

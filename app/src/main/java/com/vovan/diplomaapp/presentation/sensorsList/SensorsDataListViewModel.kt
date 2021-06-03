@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vovan.diplomaapp.domain.SensorsRepository
+import com.vovan.diplomaapp.domain.entity.SensorsEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -23,7 +24,7 @@ class SensorsDataListViewModel @Inject constructor(
 
     init {
         _state.value = SensorsDataListViewState.Loading
-        fetchData()
+        fetchData(TODAY)
     }
 
     override fun onCleared() {
@@ -31,12 +32,14 @@ class SensorsDataListViewModel @Inject constructor(
         disposable?.dispose()
     }
 
-    fun updateData() {
-        fetchData()
+
+
+    fun updateData(tableName: String) {
+        fetchData(tableName)
     }
 
-    private fun fetchData() {
-        disposable = api.getSensors()
+    private fun fetchData(tableName: String) {
+        disposable = api.getSensors(tableName)
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -46,5 +49,10 @@ class SensorsDataListViewModel @Inject constructor(
                         SensorsDataListViewState.Error(error.message ?: "Unknown Error (null)")
                 }
             )
+    }
+
+    companion object{
+        const val TODAY = "SC_DataToday"
+        const val DAILY = "SC_DailyData"
     }
 }

@@ -7,7 +7,7 @@ data class ItemsSensorsDTO(
 )
 
 data class SensorsDTO(
-    val time: String,
+    val time: Long,
     val device: String,
     val temperature: Float,
     val light: Int,
