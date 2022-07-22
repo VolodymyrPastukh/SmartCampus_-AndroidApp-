@@ -4,6 +4,6 @@ data class SensorsEntity(
     val time: String,
     val device: String,
     val temperature: Float,
-    val light: Int,
+    val light: Float,
     val pressure: Int
 )

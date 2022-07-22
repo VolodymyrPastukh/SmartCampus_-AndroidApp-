@@ -10,6 +10,6 @@ data class SensorsDTO(
     val time: Long,
     val device: String,
     val temperature: Float,
-    val light: Int,
+    val light: Float,
     val pressure: Int
 )

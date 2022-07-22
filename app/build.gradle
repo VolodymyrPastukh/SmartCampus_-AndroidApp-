@@ -7,13 +7,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 32
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.vovan.diplomaapp"
         minSdkVersion 16
-        targetSdkVersion 30
+        targetSdkVersion 32
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -60,7 +60,8 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:2.3.5"
 
     //ViewModel
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0'
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.4.0"
 
     //AWS
     implementation 'com.amazonaws:aws-android-sdk-iot:2.15.2'

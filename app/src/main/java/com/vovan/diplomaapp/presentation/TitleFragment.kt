@@ -18,30 +18,28 @@ class TitleFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-
-        binding = DataBindingUtil.inflate(
+    ): View = FragmentTitleBinding.inflate(
             inflater,
-            R.layout.fragment_title,
             container,
-            false)
+            false).apply { binding = this }.root
 
-        binding.sensorsButton.setOnClickListener {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initView()
+    }
+
+    private fun initView() = with(binding){
+        sensorsButton.setOnClickListener {
             findNavController().navigate(TitleFragmentDirections.actionTitleFragmentToDataFragment())
         }
 
-
-        binding.ledButton.setOnClickListener {
+        ledButton.setOnClickListener {
             findNavController().navigate(TitleFragmentDirections.actionTitleFragmentToLedControllerFragment())
         }
 
-        binding.listButton.setOnClickListener {
+        listButton.setOnClickListener {
             findNavController().navigate(TitleFragmentDirections.actionTitleFragmentToSensorsDataList())
         }
-
-
-
-        return binding.root
     }
 
 }

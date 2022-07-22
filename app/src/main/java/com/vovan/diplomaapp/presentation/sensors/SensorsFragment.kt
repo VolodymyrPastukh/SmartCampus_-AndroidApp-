@@ -6,14 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.vovan.diplomaapp.R
 import com.vovan.diplomaapp.databinding.FragmentSensorsBinding
 import com.vovan.diplomaapp.domain.entity.SensorsEntity
+import com.vovan.diplomaapp.presentation.model.SensorDataState
+import com.vovan.diplomaapp.presentation.model.SensorsConnectionState
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -26,53 +26,54 @@ class SensorsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        binding = DataBindingUtil.inflate(
-            inflater,
-            R.layout.fragment_sensors,
-            container,
-            false
-        )
-
-        viewModel.state.observe(viewLifecycleOwner) { state ->
-            displayData(state)
-        }
+    ): View = FragmentSensorsBinding.inflate(
+        inflater,
+        container,
+        false
+    ).apply { binding = this }.root
 
 
-        return binding.root
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initView()
     }
 
+    private fun initView() {
+        viewModel.connectionState.observe(viewLifecycleOwner) { processConnectionState(it) }
+    }
 
-
-    private fun displayData(state: SensorsViewState){
-        when(state){
-            is SensorsViewState.Connecting -> {
-                binding.progressBar.show()
-                binding.progressBar.setIndicatorColor(Color.BLACK)
-                binding.progressBar.isIndeterminate = true
+    private fun processConnectionState(state: SensorsConnectionState) = with(binding) {
+        when (state) {
+            is SensorsConnectionState.Connecting -> {
+                progressBar.show()
+                progressBar.setIndicatorColor(Color.BLACK)
+                progressBar.isIndeterminate = true
             }
 
-            is SensorsViewState.Connected -> {
+            is SensorsConnectionState.Connected -> {
                 Snackbar.make(
                     requireActivity().findViewById(android.R.id.content),
                     getString(R.string.Connected),
-                    Snackbar.LENGTH_SHORT // How long to display the message.
+                    Snackbar.LENGTH_SHORT
                 ).show()
-                binding.progressBar.hide()
+                progressBar.hide()
+                viewModel.dataState.observe(viewLifecycleOwner) { processDataState(it) }
             }
 
-            is SensorsViewState.Data -> setFields(state.data)
-
-            is SensorsViewState.Error ->
+            is SensorsConnectionState.Error ->
                 Toast.makeText(context, "Error: ${state.message}", Toast.LENGTH_LONG).show()
         }
     }
 
-    private fun setFields(sensors: SensorsEntity){
-        binding.date.text = sensors.time
-        binding.temperature.text = sensors.temperature.toString()
-        binding.light.text = sensors.light.toString()
-        binding.pressure.text = sensors.pressure.toString()
+    private fun processDataState(state: SensorDataState<SensorsEntity>) {
+        setFields(state.data)
+    }
+
+    private fun setFields(sensors: SensorsEntity) = with(binding) {
+        date.text = sensors.time
+        temperature.text = sensors.temperature.toString()
+        light.text = sensors.light.toString()
+        pressure.text = sensors.pressure.toString()
     }
 
 }
