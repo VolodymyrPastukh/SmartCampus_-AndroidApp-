@@ -11,7 +11,7 @@ import retrofit2.http.Query
 
 interface LambdaApi{
     @GET("SmartCampusHTTPReadDatabase")
-    fun fetchSensorsDataToday(
+    suspend fun fetchSensorsDataToday(
         @Query("TableName") tableName: String = "SC_DataToday"
-    ): Single<ItemsSensorsDTO>
+    ): ItemsSensorsDTO
 }

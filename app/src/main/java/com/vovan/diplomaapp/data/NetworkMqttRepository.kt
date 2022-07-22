@@ -16,6 +16,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.UnsupportedEncodingException
@@ -59,7 +61,7 @@ class NetworkMqttRepository(
             Timber.e("Subscribe FlowCallback closed")
             manager.unsubscribeTopic(topic)
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     override suspend fun publish(topic: String, data: String): Boolean {
         return withContext(Dispatchers.IO) {
