@@ -5,5 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 
 interface SensorsRepository {
-    fun getSensors(tableName: String): Flow<SensorsEntity>
+    suspend fun getSensors(tableName: String): List<SensorsEntity>
 }

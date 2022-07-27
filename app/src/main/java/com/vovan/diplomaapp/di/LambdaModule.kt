@@ -7,6 +7,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -29,7 +30,10 @@ object LambdaModule {
     }
 
     @Provides
-    fun provideLambdaRepository(api: LambdaApi): SensorsRepository {
-        return LambdaSensorsRepository(api)
+    fun provideLambdaRepository(
+        api: LambdaApi,
+        @DefaultDispatcher defaultDispatcher: CoroutineDispatcher,
+    ): SensorsRepository {
+        return LambdaSensorsRepository(api, defaultDispatcher)
     }
 }

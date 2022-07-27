@@ -20,10 +20,7 @@ class LedControllerViewModel @Inject constructor(
     private val gson: Gson
 ) : ViewModel() {
 
-    private val _connectionState = repository.connect().map { it.toSensorConnectionState() }.asLiveData()
-    val connectionState: LiveData<SensorsConnectionState>
-        get() = _connectionState
-
+    val connectionState = repository.connection.map { it.toSensorConnectionState() }.asLiveData()
     private val _dataState = MutableLiveData<SensorDataState<List<Boolean>>>()
     val dataState: LiveData<SensorDataState<List<Boolean>>>
         get() = _dataState

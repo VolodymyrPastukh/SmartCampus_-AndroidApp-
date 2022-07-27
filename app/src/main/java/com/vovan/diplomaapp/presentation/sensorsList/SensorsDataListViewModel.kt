@@ -12,6 +12,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,9 +35,10 @@ class SensorsDataListViewModel @Inject constructor(
     }
 
     private fun fetchData(tableName: String) {
-        api.getSensors(tableName).onEach {
-
-        }.launchIn(viewModelScope)
+        viewModelScope.launch {
+            val sensors = api.getSensors(tableName)
+            _state.postValue(SensorsDataListViewState.Data(sensors))
+        }
     }
 
     companion object{

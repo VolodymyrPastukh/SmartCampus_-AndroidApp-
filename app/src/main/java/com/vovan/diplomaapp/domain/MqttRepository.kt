@@ -7,7 +7,7 @@ import io.reactivex.Observable
 import kotlinx.coroutines.flow.Flow
 
 interface MqttRepository {
-    fun connect(): Flow<ConnectionState>
+    val connection: Flow<ConnectionState>
     fun subscribe(topic: String): Flow<SensorsEntity>
     suspend fun publish(topic: String, data: String): Boolean
 }

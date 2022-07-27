@@ -12,6 +12,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import java.util.*
 import javax.inject.Singleton
 
@@ -49,8 +51,10 @@ object MqttModule {
     fun provideMqttRepository(
         manager: AWSIotMqttManager,
         credentialsProvider: CognitoCachingCredentialsProvider,
-        gson: Gson
+        gson: Gson,
+        @ApplicationScope coroutineScope: CoroutineScope,
+        @DefaultDispatcher defaultDispatcher: CoroutineDispatcher
     ): MqttRepository {
-        return NetworkMqttRepository(manager, credentialsProvider, gson)
+        return NetworkMqttRepository(manager, credentialsProvider, gson, coroutineScope, defaultDispatcher)
     }
 }
