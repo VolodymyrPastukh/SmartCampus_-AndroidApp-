@@ -38,9 +38,9 @@ class LedControllerFragment : Fragment() {
     }
 
     private fun initView() = with(binding) {
-        redLed.setOnClickListener { viewModel.turnOnLed(LedControllerViewModel.RED_LED) }
-        greenLed.setOnClickListener { viewModel.turnOnLed(LedControllerViewModel.GREEN_LED) }
-        blueLed.setOnClickListener { viewModel.turnOnLed(LedControllerViewModel.BLUE_LED) }
+        redLed.setOnClickListener { viewModel.clickOnLed(LedControllerViewModel.RED_LED) }
+        greenLed.setOnClickListener { viewModel.clickOnLed(LedControllerViewModel.GREEN_LED) }
+        blueLed.setOnClickListener { viewModel.clickOnLed(LedControllerViewModel.BLUE_LED) }
 
         viewModel.connectionState.observe(viewLifecycleOwner) { processConnectionState(it) }
         viewModel.dataState.observe(viewLifecycleOwner) { processDataState(it) }

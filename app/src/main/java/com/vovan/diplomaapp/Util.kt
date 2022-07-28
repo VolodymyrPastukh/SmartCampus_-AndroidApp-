@@ -7,9 +7,6 @@ import com.vovan.diplomaapp.domain.entity.SensorsEntity
 import java.text.SimpleDateFormat
 import java.util.*
 
-const val TODAY = "SC_DataToday"
-const val DAILY = "SC_DailyData"
-
 fun AWSIotMqttClientStatus.toAwsConnectionState(): ConnectionState =
     when (this) {
         AWSIotMqttClientStatus.Connecting -> ConnectionState.Connecting
@@ -27,13 +24,13 @@ fun SensorsDTO.toEntity(): SensorsEntity = SensorsEntity(
 )
 
 fun SensorsDTO.toEntity(tableName: String): SensorsEntity {
-    var formatedTime = ""
+    var formattedTime = ""
     when (tableName) {
-        TODAY -> formatedTime = convertLongToTime(time, "HH:mm:ss")
-        DAILY -> formatedTime = convertLongToTime(time, "yyyy.MM.dd")
+        TODAY_L -> formattedTime = convertLongToTime(time, "HH:mm:ss")
+        DAILY_L -> formattedTime = convertLongToTime(time, "yyyy.MM.dd")
     }
     return SensorsEntity(
-        formatedTime,
+        formattedTime,
         device,
         temperature,
         light,
@@ -46,3 +43,11 @@ fun convertLongToTime(time: Long, pattern: String): String {
     val format = SimpleDateFormat(pattern, Locale.GERMANY)
     return format.format(date)
 }
+
+fun defineSharedState(vararg states: Boolean): Int {
+    var result = 0
+    states.forEachIndexed { position, state -> if (state) result = result or (1 shl position) }
+    return result
+}
+
+fun defineSharedStateReversed(vararg states: Boolean) = defineSharedState(*states.reversed().toBooleanArray())

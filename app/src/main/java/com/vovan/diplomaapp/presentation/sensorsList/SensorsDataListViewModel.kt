@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vovan.diplomaapp.TODAY_L
 import com.vovan.diplomaapp.domain.SensorsRepository
 import com.vovan.diplomaapp.domain.entity.SensorsEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +27,7 @@ class SensorsDataListViewModel @Inject constructor(
 
     init {
         _state.value = SensorsDataListViewState.Loading
-        fetchData(TODAY)
+        fetchData(TODAY_L)
     }
 
 
@@ -39,10 +40,5 @@ class SensorsDataListViewModel @Inject constructor(
             val sensors = api.getSensors(tableName)
             _state.postValue(SensorsDataListViewState.Data(sensors))
         }
-    }
-
-    companion object{
-        const val TODAY = "SC_DataToday"
-        const val DAILY = "SC_DailyData"
     }
 }

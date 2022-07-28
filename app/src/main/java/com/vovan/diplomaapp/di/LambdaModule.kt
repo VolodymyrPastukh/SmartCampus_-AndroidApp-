@@ -23,7 +23,6 @@ object LambdaModule {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://2op9csyc6c.execute-api.eu-west-2.amazonaws.com/default/")
             .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build()
 
         return retrofit.create(LambdaApi::class.java)

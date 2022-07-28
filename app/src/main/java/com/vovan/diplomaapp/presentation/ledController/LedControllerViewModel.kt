@@ -1,13 +1,11 @@
 package com.vovan.diplomaapp.presentation.ledController
 
 import androidx.lifecycle.*
-import com.google.gson.Gson
 import com.vovan.diplomaapp.TOPIC_PUB
+import com.vovan.diplomaapp.defineSharedState
 import com.vovan.diplomaapp.domain.MqttRepository
-import com.vovan.diplomaapp.domain.entity.ConnectionState
 import com.vovan.diplomaapp.domain.entity.LedControllerEntity
 import com.vovan.diplomaapp.presentation.model.SensorDataState
-import com.vovan.diplomaapp.presentation.model.SensorsConnectionState
 import com.vovan.diplomaapp.presentation.model.toSensorConnectionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
@@ -17,34 +15,26 @@ import javax.inject.Inject
 @HiltViewModel
 class LedControllerViewModel @Inject constructor(
     private val repository: MqttRepository,
-    private val gson: Gson
 ) : ViewModel() {
 
     val connectionState = repository.connection.map { it.toSensorConnectionState() }.asLiveData()
-    private val _dataState = MutableLiveData<SensorDataState<List<Boolean>>>()
+    private val _dataState = MutableLiveData(SensorDataState(Rgb.getState()))
     val dataState: LiveData<SensorDataState<List<Boolean>>>
         get() = _dataState
 
-    private fun publish(message: String) {
+    private fun publish(ledEntity: LedControllerEntity) {
         viewModelScope.launch {
-            val completedSuccess = repository.publish(TOPIC_PUB, message)
-            if(completedSuccess) _dataState.postValue(SensorDataState(Rgb.getState()))
+            val completedSuccess = repository.publish(TOPIC_PUB, ledEntity)
+            if (completedSuccess) _dataState.value = SensorDataState(Rgb.getState())
         }
     }
 
 
-    fun turnOnLed(color: String) {
-        val led = LedControllerEntity(
-            "Vova",
-            Rgb.setColor(color)
-        )
+    fun clickOnLed(color: String) {
+        val led = LedControllerEntity("Feel the pain!!!", Rgb.setColor(color))
+            .also { it.buzzer = if (it.rgb == 7) 1 else 0 }
 
-        //Turn on buzzer if each color is active
-        if (led.rgb == 7) led.buzzer = 1
-        else led.buzzer = 0
-
-        val message = gson.toJson(led)
-        publish(message)
+        publish(led)
     }
 
     private object Rgb {
@@ -61,13 +51,7 @@ class LedControllerViewModel @Inject constructor(
             return getRgbNumber()
         }
 
-        private fun getRgbNumber(): Int {
-            var result = 0
-            if(red) result = result or 1
-            if(green) result = result or 2
-            if(blue) result = result or 4
-            return result
-        }
+        private fun getRgbNumber(): Int = defineSharedState(red, green, blue)
 
         fun getState(): List<Boolean> = listOf(red, green, blue)
     }

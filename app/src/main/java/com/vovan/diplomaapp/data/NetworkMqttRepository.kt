@@ -10,6 +10,7 @@ import com.vovan.diplomaapp.di.ApplicationScope
 import com.vovan.diplomaapp.di.DefaultDispatcher
 import com.vovan.diplomaapp.domain.MqttRepository
 import com.vovan.diplomaapp.domain.entity.ConnectionState
+import com.vovan.diplomaapp.domain.entity.LedControllerEntity
 import com.vovan.diplomaapp.domain.entity.SensorsEntity
 import com.vovan.diplomaapp.toAwsConnectionState
 import io.reactivex.Completable
@@ -67,10 +68,11 @@ class NetworkMqttRepository(
         }
     }.flowOn(defaultDispatcher)
 
-    override suspend fun publish(topic: String, data: String): Boolean {
+    override suspend fun publish(topic: String, data: LedControllerEntity): Boolean {
+        val message = gson.toJson(data)
         return withContext(Dispatchers.IO) {
             try {
-                manager.publishString(data, topic, AWSIotMqttQos.QOS0)
+                manager.publishString(message, topic, AWSIotMqttQos.QOS0)
                 true
             } catch (e: Throwable) {
                 Timber.e(e)

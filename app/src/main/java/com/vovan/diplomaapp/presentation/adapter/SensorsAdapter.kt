@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.vovan.diplomaapp.databinding.SensorsItemBinding
 import com.vovan.diplomaapp.domain.entity.SensorsEntity
+import kotlinx.coroutines.withContext
 
 class SensorsAdapter :
     ListAdapter<SensorsEntity, SensorsAdapter.SensorsViewHolder>(SensorsItemDiffCallback()) {
@@ -23,11 +24,11 @@ class SensorsAdapter :
     class SensorsViewHolder private constructor(private val binding: SensorsItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: SensorsEntity) {
-            binding.time.text = item.time
-            binding.temperature.text = item.temperature.toString()
-            binding.light.text = item.light.toString()
-            binding.pressure.text = item.pressure.toString()
+        fun bind(item: SensorsEntity) = with(binding){
+            time.text = item.time
+            temperature.text = item.temperature.toString()
+            light.text = item.light.toString()
+            pressure.text = item.pressure.toString()
         }
 
 
