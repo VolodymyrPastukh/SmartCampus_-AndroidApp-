@@ -12,7 +12,7 @@ fun AWSIotMqttClientStatus.toAwsConnectionState(): ConnectionState =
         AWSIotMqttClientStatus.Connecting -> ConnectionState.Connecting
         AWSIotMqttClientStatus.Connected -> ConnectionState.Connected
         AWSIotMqttClientStatus.ConnectionLost -> ConnectionState.Disconnect
-        AWSIotMqttClientStatus.Reconnecting -> ConnectionState.Connecting
+        AWSIotMqttClientStatus.Reconnecting -> ConnectionState.Reconnecting
     }
 
 fun SensorsDTO.toEntity(): SensorsEntity = SensorsEntity(

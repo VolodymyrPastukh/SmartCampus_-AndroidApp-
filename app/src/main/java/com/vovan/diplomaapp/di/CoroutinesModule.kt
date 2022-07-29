@@ -4,10 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.*
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -19,9 +16,10 @@ object CoroutinesModule {
     @Singleton
     @Provides
     fun providesExternalCoroutineScope(
-        @DefaultDispatcher defaultDispatcher: CoroutineDispatcher
+        @DefaultDispatcher defaultDispatcher: CoroutineDispatcher,
+        coroutineExceptionHandler: CoroutineExceptionHandler
     ): CoroutineScope =
-        CoroutineScope(SupervisorJob() + defaultDispatcher)
+        CoroutineScope(SupervisorJob() + defaultDispatcher + coroutineExceptionHandler)
 
     @DefaultDispatcher
     @Provides
@@ -34,6 +32,11 @@ object CoroutinesModule {
     @MainDispatcher
     @Provides
     fun providesMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
+
+    @Provides
+    fun coroutineExceptionHandler(): CoroutineExceptionHandler = CoroutineExceptionHandler{ _, throwable ->
+        throwable.printStackTrace()
+    }
 }
 
 @Retention(AnnotationRetention.RUNTIME)

@@ -4,4 +4,5 @@ sealed class ConnectionState {
     object Connecting : ConnectionState()
     object Connected : ConnectionState()
     object Disconnect : ConnectionState()
+    object Reconnecting : ConnectionState()
 }

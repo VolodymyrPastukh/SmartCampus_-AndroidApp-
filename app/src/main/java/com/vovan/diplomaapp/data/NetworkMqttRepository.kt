@@ -15,13 +15,10 @@ import com.vovan.diplomaapp.domain.entity.SensorsEntity
 import com.vovan.diplomaapp.toAwsConnectionState
 import io.reactivex.Completable
 import io.reactivex.Observable
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.UnsupportedEncodingException
 
@@ -39,7 +36,7 @@ class NetworkMqttRepository(
         ) { status, throwable ->
             if (throwable != null) {
                 Timber.e("Connection error ${throwable.message}")
-                close(throwable)
+//                close(throwable)
             }
             Timber.i("Connection status ${status}")
             trySend(status.toAwsConnectionState()).isSuccess
@@ -80,4 +77,6 @@ class NetworkMqttRepository(
             }
         }
     }
+
+
 }

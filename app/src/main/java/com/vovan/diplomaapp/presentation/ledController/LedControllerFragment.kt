@@ -1,6 +1,7 @@
 package com.vovan.diplomaapp.presentation.ledController
 
 import android.graphics.Color
+import android.opengl.Visibility
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -60,11 +61,20 @@ class LedControllerFragment : Fragment() {
                     getString(R.string.Connected),
                     Snackbar.LENGTH_SHORT // How long to display the message.
                 ).show()
+                offlineWarningTv.visibility = View.GONE
                 progressBar.hide()
             }
 
-            is SensorsConnectionState.Error ->
-                Toast.makeText(context, "Error ${state.message}", Toast.LENGTH_SHORT).show()
+            is SensorsConnectionState.Disconnected ->{
+                Snackbar.make(
+                    requireActivity().findViewById(android.R.id.content),
+                    getString(R.string.Disconnected),
+                    Snackbar.LENGTH_SHORT // How long to display the message.
+                ).show()
+                offlineWarningTv.visibility = View.VISIBLE
+                progressBar.hide()
+            }
+
         }
     }
 
@@ -81,6 +91,11 @@ class LedControllerFragment : Fragment() {
 
         if (data[2]) blueLed.setImageResource(R.drawable.blueled)
         else blueLed.setImageResource(R.drawable.led)
+    }
+
+    override fun onDestroy() {
+        viewModel.prepareWork()
+        super.onDestroy()
     }
 
 }
