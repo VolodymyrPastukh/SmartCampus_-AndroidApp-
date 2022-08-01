@@ -27,4 +27,7 @@ class FakeMqttRepository(
         return true
     }
 
+    override fun disconnect() {
+
+    }
 }

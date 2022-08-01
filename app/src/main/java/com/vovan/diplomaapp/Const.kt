@@ -6,3 +6,6 @@ const val TOPIC_PUB = "esp32/pub"
 
 const val TODAY_L = "SC_DataToday"
 const val DAILY_L = "SC_DailyData"
+
+// WORKERS UUIDs
+const val OFFLINE_LED_PUBLISH = "publishLedRequestId"

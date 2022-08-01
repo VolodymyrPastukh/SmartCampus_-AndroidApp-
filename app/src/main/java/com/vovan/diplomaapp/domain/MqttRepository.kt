@@ -11,4 +11,5 @@ interface MqttRepository {
     val connection: Flow<ConnectionState>
     fun subscribe(topic: String): Flow<SensorsEntity>
     suspend fun publish(topic: String, data: LedControllerEntity): Boolean
+    fun disconnect()
 }

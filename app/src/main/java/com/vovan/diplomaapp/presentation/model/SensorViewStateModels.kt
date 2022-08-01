@@ -17,3 +17,9 @@ fun ConnectionState.toSensorConnectionState(): SensorsConnectionState = when (th
 }
 
 data class SensorDataState<T>(val data: T)
+
+sealed class BackgroundInfoEventState {
+    data class Success<T>(val data: T): BackgroundInfoEventState()
+    object Error: BackgroundInfoEventState()
+    object Unknown: BackgroundInfoEventState()
+}

@@ -7,6 +7,7 @@ import com.amazonaws.regions.Regions
 import com.google.gson.Gson
 import com.vovan.diplomaapp.data.NetworkMqttRepository
 import com.vovan.diplomaapp.domain.MqttRepository
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,6 +25,7 @@ private val region = Regions.EU_WEST_2
 @InstallIn(SingletonComponent::class)
 @Module
 object MqttModule {
+
 
     @Singleton
     @Provides
@@ -47,6 +49,7 @@ object MqttModule {
     @Provides
     fun provideGsonConverter(): Gson = Gson()
 
+    @Singleton
     @Provides
     fun provideMqttRepository(
         manager: AWSIotMqttManager,

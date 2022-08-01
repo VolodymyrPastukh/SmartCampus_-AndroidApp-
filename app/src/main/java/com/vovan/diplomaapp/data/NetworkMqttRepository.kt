@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.flowOn
 import timber.log.Timber
 import java.io.UnsupportedEncodingException
+import javax.inject.Inject
 
 class NetworkMqttRepository(
     private val manager: AWSIotMqttManager,
@@ -78,5 +79,7 @@ class NetworkMqttRepository(
         }
     }
 
-
+    override fun disconnect(){
+        manager.disconnect()
+    }
 }

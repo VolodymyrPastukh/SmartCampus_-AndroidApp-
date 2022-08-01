@@ -1,5 +1,6 @@
 package com.vovan.diplomaapp.presentation.ledController
 
+import android.app.AlertDialog
 import android.graphics.Color
 import android.opengl.Visibility
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.app.DialogCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
@@ -14,6 +16,7 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.vovan.diplomaapp.R
 import com.vovan.diplomaapp.databinding.FragmentLedControllerBinding
+import com.vovan.diplomaapp.presentation.model.BackgroundInfoEventState
 import com.vovan.diplomaapp.presentation.model.SensorDataState
 import com.vovan.diplomaapp.presentation.model.SensorsConnectionState
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,6 +48,7 @@ class LedControllerFragment : Fragment() {
 
         viewModel.connectionState.observe(viewLifecycleOwner) { processConnectionState(it) }
         viewModel.dataState.observe(viewLifecycleOwner) { processDataState(it) }
+        viewModel.eventState.observe(viewLifecycleOwner) { processEventState(it) }
     }
 
     private fun processConnectionState(state: SensorsConnectionState) = with(binding) {
@@ -82,6 +86,23 @@ class LedControllerFragment : Fragment() {
         setColors(state.data)
     }
 
+    private fun processEventState(state: BackgroundInfoEventState) {
+        when(state){
+            is BackgroundInfoEventState.Success<*> -> {
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Last update...")
+                    .setMessage("Your last offline update was successfully completed [${state.data}]")
+                    .create().show()
+            }
+            else -> {
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Last update...")
+                    .setMessage("Something went wrong with your changes")
+                    .create().show()
+            }
+        }
+    }
+
     private fun setColors(data: List<Boolean>) = with(binding){
         if (data[0]) redLed.setImageResource(R.drawable.redled)
         else redLed.setImageResource(R.drawable.led)
@@ -92,10 +113,4 @@ class LedControllerFragment : Fragment() {
         if (data[2]) blueLed.setImageResource(R.drawable.blueled)
         else blueLed.setImageResource(R.drawable.led)
     }
-
-    override fun onDestroy() {
-        viewModel.prepareWork()
-        super.onDestroy()
-    }
-
 }

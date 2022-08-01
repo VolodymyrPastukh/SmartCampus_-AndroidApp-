@@ -50,4 +50,8 @@ fun defineSharedState(vararg states: Boolean): Int {
     return result
 }
 
-fun defineSharedStateReversed(vararg states: Boolean) = defineSharedState(*states.reversed().toBooleanArray())
+fun defineSharedStateReversed(vararg states: Boolean) =
+    defineSharedState(*states.reversed().toBooleanArray())
+
+fun convertLongToTime(time: Long = System.currentTimeMillis()) =
+    SimpleDateFormat("yyyy.MM.dd HH:mm").format(Date(time))
