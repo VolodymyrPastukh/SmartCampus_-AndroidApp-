@@ -93,7 +93,7 @@ class LedControllerViewModel @Inject constructor(
             .build()
 
         sharedPreferences.putValueTo(OFFLINE_LED_PUBLISH, request.id.toString())
-        workManager.enqueue(request)
+        workManager.beginUniqueWork(OFFLINE_LED_PUBLISH, ExistingWorkPolicy.REPLACE, request).enqueue()
     }
 
     private object Rgb {
