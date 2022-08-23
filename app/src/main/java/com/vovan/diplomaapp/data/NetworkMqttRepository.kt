@@ -2,87 +2,84 @@ package com.vovan.diplomaapp.data
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.amazonaws.mobileconnectors.iot.AWSIotMqttManager
+import com.amazonaws.mobileconnectors.iot.AWSIotMqttMessageDeliveryCallback
+import com.amazonaws.mobileconnectors.iot.AWSIotMqttNewMessageCallback
 import com.amazonaws.mobileconnectors.iot.AWSIotMqttQos
 import com.google.gson.Gson
+import com.vovan.diplomaapp.di.ApplicationScope
+import com.vovan.diplomaapp.di.DefaultDispatcher
 import com.vovan.diplomaapp.domain.MqttRepository
 import com.vovan.diplomaapp.domain.entity.ConnectionState
+import com.vovan.diplomaapp.domain.entity.LedControllerEntity
 import com.vovan.diplomaapp.domain.entity.SensorsEntity
 import com.vovan.diplomaapp.toAwsConnectionState
 import io.reactivex.Completable
 import io.reactivex.Observable
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.flowOn
 import timber.log.Timber
 import java.io.UnsupportedEncodingException
+import javax.inject.Inject
 
 class NetworkMqttRepository(
     private val manager: AWSIotMqttManager,
     private val credentialsProvider: CognitoCachingCredentialsProvider,
-    private val gson: Gson
+    private val gson: Gson,
+    @ApplicationScope private val externalScope: CoroutineScope,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : MqttRepository {
 
-    /*
-        Connection to AWS IoT Core Broker
-        @return Observable<ConnectionState>
-    */
-    override fun connect(): Observable<ConnectionState> {
-        return Observable.create { subscriber ->
-            manager.connect(
-                credentialsProvider
-            ) { status, throwable ->
-                Timber.d("Status = $status")
-                subscriber.onNext(status.toAwsConnectionState())
-                if (throwable != null) subscriber.onError(throwable)
+    override val connection = callbackFlow {
+        manager.connect(
+            credentialsProvider
+        ) { status, throwable ->
+            if (throwable != null) {
+                Timber.e("Connection error ${throwable.message}")
+//                close(throwable)
             }
+            Timber.i("Connection status ${status}")
+            trySend(status.toAwsConnectionState()).isSuccess
         }
-    }
 
-    /*
-        Subscribe to AWS IoT Core topic
-        @param topic
-            name of topic
-        @return Observable<SensorsEntity>
-    */
-    override fun subscribe(topic: String): Observable<SensorsEntity> {
-        return Observable.create { subscriber ->
-            manager.subscribeToTopic(
-                topic,
-                AWSIotMqttQos.QOS0
-            ) { _, message ->
-                try {
-                    val data = String(message, Charsets.UTF_8)
-                    val sensorsEntity = gson.fromJson(data, SensorsEntity::class.java)
-                    subscriber.onNext(sensorsEntity)
-
-                } catch (e: UnsupportedEncodingException) {
-                    subscriber.onError(e)
-                }
-            }
+        awaitClose {
+            Timber.e("Connection FlowCallback closed")
+            manager.disconnect()
         }
-    }
+    }.shareIn(externalScope, SharingStarted.Eagerly, 1)
 
-    /*
-        Publishing to AWS IoT Core Broker
-        @param topic
-            name of topic
-        @param message
-            object in json
-        @return Completable (RxJava object)
-     */
-    override fun publish(topic: String, data: String): Completable {
-        return Completable.create { subscriber ->
+    override fun subscribe(topic: String): Flow<SensorsEntity> = callbackFlow<SensorsEntity> {
+        manager.subscribeToTopic(topic, AWSIotMqttQos.QOS0) { _, message ->
             try {
-                manager.publishString(data, topic, AWSIotMqttQos.QOS0)
-                subscriber.onComplete()
+                val data = String(message, Charsets.UTF_8)
+                val sensorsEntity = gson.fromJson(data, SensorsEntity::class.java)
+                trySend(sensorsEntity).isSuccess
+
+            } catch (e: UnsupportedEncodingException) {
+                close(e)
+            }
+        }
+        awaitClose {
+            Timber.e("Subscribe FlowCallback closed")
+            manager.unsubscribeTopic(topic)
+        }
+    }.flowOn(defaultDispatcher)
+
+    override suspend fun publish(topic: String, data: LedControllerEntity): Boolean {
+        val message = gson.toJson(data)
+        return withContext(Dispatchers.IO) {
+            try {
+                manager.publishString(message, topic, AWSIotMqttQos.QOS0)
+                true
             } catch (e: Throwable) {
-                subscriber.onError(e)
+                Timber.e(e)
+                false
             }
         }
     }
 
-    /*
-        Disconnect from AWS IoT Core Broker
-    */
-    override fun disconnect() {
+    override fun disconnect(){
         manager.disconnect()
     }
-
 }

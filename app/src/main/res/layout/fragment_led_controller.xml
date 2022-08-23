@@ -20,6 +20,18 @@
             android:textColor="@color/black"
             android:textSize="25sp" />
 
+        <TextView
+            android:id="@+id/offline_warning_tv"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:textSize="10sp"
+            android:visibility="gone"
+            android:textColor="#919191"
+            android:fontFamily="@font/term"
+            android:text="You are in offline mode"
+            android:layout_weight="0.2"/>
+
         <ImageView
             android:id="@+id/redLed"
             android:layout_width="match_parent"

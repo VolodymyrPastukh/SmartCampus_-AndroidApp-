@@ -1,18 +1,24 @@
 package com.vovan.diplomaapp.presentation.ledController
 
+import android.app.AlertDialog
 import android.graphics.Color
+import android.opengl.Visibility
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.app.DialogCompat
 import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.vovan.diplomaapp.R
 import com.vovan.diplomaapp.databinding.FragmentLedControllerBinding
+import com.vovan.diplomaapp.presentation.model.BackgroundInfoEventState
+import com.vovan.diplomaapp.presentation.model.SensorDataState
+import com.vovan.diplomaapp.presentation.model.SensorsConnectionState
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -24,70 +30,87 @@ class LedControllerFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        binding = DataBindingUtil.inflate(
+    ): View = FragmentLedControllerBinding.inflate(
             inflater,
-            R.layout.fragment_led_controller,
             container,
             false
-        )
+        ).apply { binding = this }.root
 
-        binding.redLed.setOnClickListener {
-            viewModel.turnOnLed(LedControllerViewModel.RED_LED)
-        }
-
-        binding.greenLed.setOnClickListener {
-            viewModel.turnOnLed(LedControllerViewModel.GREEN_LED)
-        }
-
-        binding.blueLed.setOnClickListener {
-            viewModel.turnOnLed(LedControllerViewModel.BLUE_LED)
-        }
-
-        viewModel.state.observe(viewLifecycleOwner) { state ->
-            displayData(state)
-        }
-
-
-
-        return binding.root
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initView()
     }
 
+    private fun initView() = with(binding) {
+        redLed.setOnClickListener { viewModel.clickOnLed(LedControllerViewModel.RED_LED) }
+        greenLed.setOnClickListener { viewModel.clickOnLed(LedControllerViewModel.GREEN_LED) }
+        blueLed.setOnClickListener { viewModel.clickOnLed(LedControllerViewModel.BLUE_LED) }
 
-    private fun displayData(state: LedControllerViewState){
-        when(state){
-            is LedControllerViewState.Connecting -> {
-                binding.progressBar.show()
-                binding.progressBar.setIndicatorColor(Color.BLACK)
-                binding.progressBar.isIndeterminate = true
+        viewModel.connectionState.observe(viewLifecycleOwner) { processConnectionState(it) }
+        viewModel.dataState.observe(viewLifecycleOwner) { processDataState(it) }
+        viewModel.eventState.observe(viewLifecycleOwner) { processEventState(it) }
+    }
+
+    private fun processConnectionState(state: SensorsConnectionState) = with(binding) {
+        when (state) {
+            is SensorsConnectionState.Connecting -> {
+                progressBar.show()
+                progressBar.setIndicatorColor(Color.BLACK)
+                progressBar.isIndeterminate = true
             }
 
-            is LedControllerViewState.Connected -> {
+            is SensorsConnectionState.Connected -> {
                 Snackbar.make(
                     requireActivity().findViewById(android.R.id.content),
                     getString(R.string.Connected),
                     Snackbar.LENGTH_SHORT // How long to display the message.
                 ).show()
-                binding.progressBar.hide()
+                offlineWarningTv.visibility = View.GONE
+                progressBar.hide()
             }
 
-            is LedControllerViewState.Data -> setColors(state.data)
+            is SensorsConnectionState.Disconnected ->{
+                Snackbar.make(
+                    requireActivity().findViewById(android.R.id.content),
+                    getString(R.string.Disconnected),
+                    Snackbar.LENGTH_SHORT // How long to display the message.
+                ).show()
+                offlineWarningTv.visibility = View.VISIBLE
+                progressBar.hide()
+            }
 
-            is LedControllerViewState.Error ->
-                Toast.makeText(context, "Error ${state.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun setColors(data: List<Boolean>) {
-        if (data[0]) binding.redLed.setImageResource(R.drawable.redled)
-        else binding.redLed.setImageResource(R.drawable.led)
-
-        if (data[1]) binding.greenLed.setImageResource(R.drawable.greenled)
-        else binding.greenLed.setImageResource(R.drawable.led)
-
-        if (data[2]) binding.blueLed.setImageResource(R.drawable.blueled)
-        else binding.blueLed.setImageResource(R.drawable.led)
+    private fun processDataState(state: SensorDataState<List<Boolean>>) {
+        setColors(state.data)
     }
 
+    private fun processEventState(state: BackgroundInfoEventState) {
+        when(state){
+            is BackgroundInfoEventState.Success<*> -> {
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Last update...")
+                    .setMessage("Your last offline update was successfully completed [${state.data}]")
+                    .create().show()
+            }
+            else -> {
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Last update...")
+                    .setMessage("Something went wrong with your changes")
+                    .create().show()
+            }
+        }
+    }
 
+    private fun setColors(data: List<Boolean>) = with(binding){
+        if (data[0]) redLed.setImageResource(R.drawable.redled)
+        else redLed.setImageResource(R.drawable.led)
+
+        if (data[1]) greenLed.setImageResource(R.drawable.greenled)
+        else greenLed.setImageResource(R.drawable.led)
+
+        if (data[2]) blueLed.setImageResource(R.drawable.blueled)
+        else blueLed.setImageResource(R.drawable.led)
+    }
 }

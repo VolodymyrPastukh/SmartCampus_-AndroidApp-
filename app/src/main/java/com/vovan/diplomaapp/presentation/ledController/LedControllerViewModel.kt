@@ -1,103 +1,101 @@
 package com.vovan.diplomaapp.presentation.ledController
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.google.gson.Gson
+import androidx.lifecycle.*
+import androidx.work.*
+import com.vovan.diplomaapp.OFFLINE_LED_PUBLISH
+import com.vovan.diplomaapp.TOPIC_PUB
+import com.vovan.diplomaapp.data.sharedPreference.SharedPreferenceDataSource
+import com.vovan.diplomaapp.defineSharedState
 import com.vovan.diplomaapp.domain.MqttRepository
-import com.vovan.diplomaapp.domain.entity.ConnectionState
 import com.vovan.diplomaapp.domain.entity.LedControllerEntity
+import com.vovan.diplomaapp.presentation.model.BackgroundInfoEventState
+import com.vovan.diplomaapp.presentation.model.SensorDataState
+import com.vovan.diplomaapp.presentation.model.SensorsConnectionState
+import com.vovan.diplomaapp.presentation.model.toSensorConnectionState
+import com.vovan.diplomaapp.presentation.workers.PublishWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
+
 
 @HiltViewModel
 class LedControllerViewModel @Inject constructor(
     private val repository: MqttRepository,
-    private val gson: Gson
+    private val sharedPreferences: SharedPreferenceDataSource,
+    private val workManager: WorkManager
 ) : ViewModel() {
 
-    private var disposable: Disposable? = null
+    val connectionState = repository.connection.map { it.toSensorConnectionState() }.asLiveData()
+    private val _dataState = MutableLiveData(SensorDataState(Rgb.getState()))
+    val dataState: LiveData<SensorDataState<List<Boolean>>>
+        get() = _dataState
 
-    private val _state = MutableLiveData<LedControllerViewState>()
-    val state: LiveData<LedControllerViewState>
-        get() = _state
+    private val _eventState = MutableSharedFlow<BackgroundInfoEventState>(replay = 1)
+    val eventState: LiveData<BackgroundInfoEventState>
+        get() = _eventState.asLiveData()
 
     init {
-        connect()
+        processWorkerOutput()
     }
 
     override fun onCleared() {
+        prepareWork()
         super.onCleared()
-        repository.disconnect()
-        disposable?.dispose()
     }
 
-    /*
-        Function makes connection to AWS IoT Core Broker
-     */
-    private fun connect() {
-        disposable = repository.connect()
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe (
-                { next -> defineConnectionState(next) },
-                { throwable -> Timber.e(throwable) }
-            )
-    }
-
-    /*
-        Function publishes data (RGB state) to remote devices
-     */
-    private fun publish(message: String) {
-        disposable = repository.publish(TOPIC_PUB, message)
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { _state.value = LedControllerViewState.Data(Rgb.getState()) },
-                { throwable -> Timber.e(throwable) }
-            )
-    }
-
-
-    /*
-        Function prepares data to publishing
-     */
-    fun turnOnLed(color: String) {
-        val led = LedControllerEntity(
-            "Vova",
-            Rgb.setColor(color)
-        )
-
-        //Turn on buzzer if each color is active
-        if (led.rgb == 7) led.buzzer = 1
-        else led.buzzer = 0
-
-        val message = gson.toJson(led)
-        publish(message)
-    }
-
-
-    /*
-        Function defines and processes AWS Connection state
-     */
-    private fun defineConnectionState(connectionState: ConnectionState) {
-        when (connectionState) {
-            ConnectionState.Connecting -> _state.value = LedControllerViewState.Connecting
-            ConnectionState.Connected -> _state.value = LedControllerViewState.Connected
-            ConnectionState.Disconnect -> _state.value = LedControllerViewState.Error("Disconnect")
+    private fun processWorkerOutput() {
+        viewModelScope.launch {
+            val uuid = sharedPreferences.getValue<String>(OFFLINE_LED_PUBLISH)
+                .also { if (it.isEmpty()) return@launch }
+            val workInfo = workManager.getWorkInfoById(UUID.fromString(uuid)).get()
+            val isSuccess = workInfo.outputData.getBoolean("isSuccess", false)
+            val publishData = workInfo.outputData.getInt("publishData", 0)
+            if (isSuccess)
+                _eventState.emit(BackgroundInfoEventState.Success(publishData))
+            else
+                _eventState.emit(BackgroundInfoEventState.Error)
+            sharedPreferences.putValueTo(OFFLINE_LED_PUBLISH, "")
         }
     }
 
+    private fun publish(ledEntity: LedControllerEntity) {
+        viewModelScope.launch {
+            val completedSuccess = repository.publish(TOPIC_PUB, ledEntity)
+            if (completedSuccess) _dataState.value = SensorDataState(Rgb.getState())
+        }
+    }
 
-    /*
-        Object which stores state of RGB led
-            and includes functions to managing the state
-        I know it isn't the best implementation, but it works, and it is enough at the moment)
-     */
+    fun clickOnLed(color: String) {
+        val led = LedControllerEntity("Online publish request", Rgb.setColor(color))
+            .also { it.buzzer = if (it.rgb == 7) 1 else 0 }
+        when (connectionState.value) {
+            SensorsConnectionState.Connected -> { publish(led) }
+            else ->  _dataState.value = SensorDataState(Rgb.getState())
+        }
+    }
+
+    private fun prepareWork() {
+        if (connectionState.value !is SensorsConnectionState.Disconnected) return
+        val inputWorkData = workDataOf("led_data" to Rgb.getRgbNumber())
+
+        val constraints: Constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val request = OneTimeWorkRequestBuilder<PublishWorker>()
+            .setConstraints(constraints)
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            .setInputData(inputWorkData)
+            .build()
+
+        sharedPreferences.putValueTo(OFFLINE_LED_PUBLISH, request.id.toString())
+        workManager.beginUniqueWork(OFFLINE_LED_PUBLISH, ExistingWorkPolicy.REPLACE, request).enqueue()
+    }
+
     private object Rgb {
         private var red = false
         private var green = false
@@ -112,24 +110,12 @@ class LedControllerViewModel @Inject constructor(
             return getRgbNumber()
         }
 
-        private fun getRgbNumber(): Int {
-            if (red && green && blue) return 7 //All
-            if (!(red || green || blue)) return 0 //None
-            if (red && green) return 4 //RG
-            if (red && blue) return 5 //RB
-            if (blue && green) return 6 //GB
-            if (red) return 1 //R
-            if (green) return 2 //G
-            if (blue) return 3 //B
-            else return 0
-        }
+        fun getRgbNumber(): Int = defineSharedState(red, green, blue)
 
         fun getState(): List<Boolean> = listOf(red, green, blue)
     }
 
     companion object {
-        const val TOPIC_PUB = "esp32/sub"
-
         const val RED_LED = "red"
         const val GREEN_LED = "green"
         const val BLUE_LED = "blue"

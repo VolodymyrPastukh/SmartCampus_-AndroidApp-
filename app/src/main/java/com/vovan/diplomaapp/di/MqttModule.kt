@@ -7,11 +7,14 @@ import com.amazonaws.regions.Regions
 import com.google.gson.Gson
 import com.vovan.diplomaapp.data.NetworkMqttRepository
 import com.vovan.diplomaapp.domain.MqttRepository
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import java.util.*
 import javax.inject.Singleton
 
@@ -22,6 +25,7 @@ private val region = Regions.EU_WEST_2
 @InstallIn(SingletonComponent::class)
 @Module
 object MqttModule {
+
 
     @Singleton
     @Provides
@@ -45,12 +49,15 @@ object MqttModule {
     @Provides
     fun provideGsonConverter(): Gson = Gson()
 
+    @Singleton
     @Provides
     fun provideMqttRepository(
         manager: AWSIotMqttManager,
         credentialsProvider: CognitoCachingCredentialsProvider,
-        gson: Gson
+        gson: Gson,
+        @ApplicationScope coroutineScope: CoroutineScope,
+        @DefaultDispatcher defaultDispatcher: CoroutineDispatcher
     ): MqttRepository {
-        return NetworkMqttRepository(manager, credentialsProvider, gson)
+        return NetworkMqttRepository(manager, credentialsProvider, gson, coroutineScope, defaultDispatcher)
     }
 }

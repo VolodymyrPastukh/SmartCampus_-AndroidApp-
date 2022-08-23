@@ -3,6 +3,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="Connected">Connected!</string>
+    <string name="Disconnected">Disconnected!</string>
     <string name="Updated">Updated!</string>
     <string name="Time">Time</string>
     <string name="temperature">Temperature</string>
@@ -14,4 +15,5 @@
     <string name="management">Management</string>
     <string name="database">Database</string>
 
+    <string name="sp_file">sp_file</string>
 </resources>

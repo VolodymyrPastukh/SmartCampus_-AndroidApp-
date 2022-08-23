@@ -12,7 +12,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
+import com.vovan.diplomaapp.DAILY_L
 import com.vovan.diplomaapp.R
+import com.vovan.diplomaapp.TODAY_L
 import com.vovan.diplomaapp.databinding.FragmentSensorsDataListBinding
 import com.vovan.diplomaapp.presentation.adapter.SensorsAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -90,9 +92,9 @@ class SensorsDataListFragment : Fragment() {
 
     private fun update(tableState: Boolean){
         if(tableState){
-            viewModel.updateData(SensorsDataListViewModel.DAILY)
+            viewModel.updateData(DAILY_L)
         }else{
-            viewModel.updateData(SensorsDataListViewModel.TODAY)
+            viewModel.updateData(TODAY_L)
         }
     }
 
