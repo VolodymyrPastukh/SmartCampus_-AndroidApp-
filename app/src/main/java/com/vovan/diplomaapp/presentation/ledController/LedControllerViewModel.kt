@@ -80,7 +80,7 @@ class LedControllerViewModel @Inject constructor(
 
     private fun prepareWork() {
         if (connectionState.value !is SensorsConnectionState.Disconnected) return
-        val inputWorkData = workDataOf("led_data" to Rgb.getState())
+        val inputWorkData = workDataOf("led_data" to Rgb.getRgbNumber())
 
         val constraints: Constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -110,7 +110,7 @@ class LedControllerViewModel @Inject constructor(
             return getRgbNumber()
         }
 
-        private fun getRgbNumber(): Int = defineSharedState(red, green, blue)
+        fun getRgbNumber(): Int = defineSharedState(red, green, blue)
 
         fun getState(): List<Boolean> = listOf(red, green, blue)
     }

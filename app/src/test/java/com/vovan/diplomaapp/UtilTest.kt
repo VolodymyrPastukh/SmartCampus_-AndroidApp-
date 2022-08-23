@@ -11,12 +11,14 @@ internal class UtilTest {
         // red  green  blue
         // reversed order
         map[0] = listOf(false, false, false)
-        map[7] = listOf(true, true, true)
+        map[1] = listOf(false, false, true)
+        map[2] = listOf(false, true, false)
         map[3] = listOf(false, true, true)
+        map[4] = listOf(true, false, false)
+        map[5] = listOf(true, false, true)
+        map[6] = listOf(true, true, false)
+        map[7] = listOf(true, true, true)
 
-        map[15] = listOf(true, true, true, true)
-        map[14] = listOf(true, true, true, false)
-        map[10] = listOf(true, false, true, false)
         map.forEach{ defineSharedStateReversed(*it.value.toBooleanArray()) shouldBe  it.key}
     }
 }

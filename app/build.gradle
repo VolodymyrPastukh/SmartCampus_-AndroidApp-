@@ -68,6 +68,7 @@ dependencies {
     testImplementation "io.mockk:mockk:1.12.5"
     testImplementation "io.kotest:kotest-assertions-core:5.4.0"
     testImplementation "androidx.arch.core:core-testing:2.1.0"
+    testImplementation 'org.robolectric:robolectric:4.8'
 
 
     implementation 'com.jakewharton.timber:timber:4.7.1'
@@ -103,7 +104,7 @@ dependencies {
     //Room
     def room_version = "2.4.3"
     implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-coroutines:2.1.0-alpha04"
 
     def work_version = "2.7.1"
