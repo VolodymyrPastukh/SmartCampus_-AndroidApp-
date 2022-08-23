@@ -9,4 +9,9 @@
     <string name="light">Light</string>
     <string name="smart_campus">Smart Campus</string>
     <string name="pressure">Pressure</string>
+
+    <string name="monitoring">Monitoring</string>
+    <string name="management">Management</string>
+    <string name="database">Database</string>
+
 </resources>

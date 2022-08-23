@@ -57,8 +57,8 @@
                     android:id="@+id/imageTemperature"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    android:src="@drawable/temperature"
-                    android:layout_centerVertical="true"/>
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/temperature" />
 
                 <TextView
                     android:id="@+id/titleTemperature"
