@@ -80,12 +80,12 @@ dependencies {
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
     // Navigation
-    implementation "androidx.navigation:navigation-fragment-ktx:2.5.0"
-    implementation "androidx.navigation:navigation-ui-ktx:2.5.0"
+    implementation "androidx.navigation:navigation-fragment-ktx:2.5.1"
+    implementation "androidx.navigation:navigation-ui-ktx:2.5.1"
 
     //ViewModel
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.0"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
 
     //AWS
     implementation 'com.amazonaws:aws-android-sdk-iot:2.15.2'
