@@ -55,3 +55,11 @@ fun defineSharedStateReversed(vararg states: Boolean) =
 
 fun convertLongToTime(time: Long = System.currentTimeMillis()) =
     SimpleDateFormat("yyyy.MM.dd HH:mm").format(Date(time))
+
+inline fun ignoreException(block: () -> Unit){
+    try {
+        block()
+    }catch (e: Exception){
+        e.printStackTrace()
+    }
+}

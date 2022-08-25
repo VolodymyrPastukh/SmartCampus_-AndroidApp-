@@ -89,7 +89,7 @@ fun TitleScreen(
 
                 DarkButton(
                     title = stringResource(R.string.database),
-                    onClick = {},
+                    onClick = { onNavigateToNext(Routes.DATABASE) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }

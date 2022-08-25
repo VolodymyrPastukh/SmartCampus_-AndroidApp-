@@ -2,26 +2,23 @@ package com.vovan.diplomaapp.data
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.amazonaws.mobileconnectors.iot.AWSIotMqttManager
-import com.amazonaws.mobileconnectors.iot.AWSIotMqttMessageDeliveryCallback
-import com.amazonaws.mobileconnectors.iot.AWSIotMqttNewMessageCallback
 import com.amazonaws.mobileconnectors.iot.AWSIotMqttQos
 import com.google.gson.Gson
 import com.vovan.diplomaapp.di.ApplicationScope
 import com.vovan.diplomaapp.di.DefaultDispatcher
 import com.vovan.diplomaapp.domain.MqttRepository
-import com.vovan.diplomaapp.domain.entity.ConnectionState
 import com.vovan.diplomaapp.domain.entity.LedControllerEntity
 import com.vovan.diplomaapp.domain.entity.SensorsEntity
+import com.vovan.diplomaapp.ignoreException
 import com.vovan.diplomaapp.toAwsConnectionState
-import io.reactivex.Completable
-import io.reactivex.Observable
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.UnsupportedEncodingException
-import javax.inject.Inject
 
 class NetworkMqttRepository(
     private val manager: AWSIotMqttManager,
@@ -62,7 +59,8 @@ class NetworkMqttRepository(
         }
         awaitClose {
             Timber.e("Subscribe FlowCallback closed")
-            manager.unsubscribeTopic(topic)
+            ignoreException { manager.unsubscribeTopic(topic) }
+
         }
     }.flowOn(defaultDispatcher)
 
@@ -79,7 +77,7 @@ class NetworkMqttRepository(
         }
     }
 
-    override fun disconnect(){
+    override fun disconnect() {
         manager.disconnect()
     }
 }

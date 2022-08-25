@@ -1,16 +1,17 @@
 package com.vovan.diplomaapp.presentation.components.custom
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.vovan.diplomaapp.R
@@ -20,9 +21,9 @@ import com.vovan.diplomaapp.presentation.components.text.TextRegular
 @Composable
 fun SensorInfoCard(
     sensor: String,
-    icon: Int,
-    value: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    icon: Int? = null,
+    value: Any? = null,
 ) {
     ElevatedCard(
         modifier = modifier,
@@ -47,7 +48,7 @@ fun SensorInfoCard(
             )
 
             Row(
-                modifier = Modifier.constrainAs(rContent){
+                modifier = Modifier.constrainAs(rContent) {
                     width = Dimension.matchParent
                     height = Dimension.fillToConstraints
                     top.linkTo(tTitle.bottom)
@@ -55,17 +56,21 @@ fun SensorInfoCard(
                 },
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    painter = painterResource(id = icon),
-                    contentDescription = null,
-                    modifier = Modifier.weight(0.5f)
-                )
+                icon?.let {
+                    Icon(
+                        painter = painterResource(id = icon),
+                        contentDescription = null,
+                        modifier = Modifier.weight(0.5f)
+                    )
+                }
 
                 TextRegular(
-                    text = value,
-                    modifier = Modifier.weight(1f),
-                    color = Colors.black
+                    text = "${value ?: " - "}",
+                    color = Colors.black,
+                    textSize = 25.sp,
+                    modifier = Modifier.weight(1.0f)
                 )
+
             }
 
         }
@@ -76,5 +81,5 @@ fun SensorInfoCard(
 @Preview
 @Composable
 private fun SensorCardPreview() {
-    return SensorInfoCard(sensor = "Compose", icon = R.drawable.temperature, "22.3")
+    return SensorInfoCard(sensor = "Compose", icon = R.drawable.temperature, value = "22.3")
 }

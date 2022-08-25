@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.vovan.diplomaapp.presentation.sensors.MonitoringScreen
+import com.vovan.diplomaapp.presentation.sensorsList.DatabaseScreen
 import com.vovan.diplomaapp.presentation.title.TitleScreen
 
 @Composable
@@ -40,6 +41,12 @@ fun ComposeNavigation(
             MonitoringScreen(
                 viewModel = hiltViewModel(),
                 onBackPressed = { navController.navigateUp() }
+            )
+        }
+
+        composable(route = Routes.DATABASE) {
+            DatabaseScreen(
+                viewModel = hiltViewModel(),
             )
         }
 
