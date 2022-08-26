@@ -77,13 +77,13 @@ fun TitleScreen(
             ) {
                 DarkButton(
                     title = stringResource(R.string.monitoring),
-                    onClick = { onNavigateToNext(Routes.MONITORING)},
+                    onClick = { onNavigateToNext(Routes.MONITORING) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 DarkButton(
                     title = stringResource(R.string.management),
-                    onClick = {},
+                    onClick = { onNavigateToNext(Routes.MANAGEMENT) },
                     modifier = Modifier.fillMaxWidth()
                 )
 

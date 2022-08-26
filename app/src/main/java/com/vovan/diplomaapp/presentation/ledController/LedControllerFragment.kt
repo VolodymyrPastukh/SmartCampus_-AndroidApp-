@@ -42,13 +42,12 @@ class LedControllerFragment : Fragment() {
     }
 
     private fun initView() = with(binding) {
-        redLed.setOnClickListener { viewModel.clickOnLed(LedControllerViewModel.RED_LED) }
-        greenLed.setOnClickListener { viewModel.clickOnLed(LedControllerViewModel.GREEN_LED) }
-        blueLed.setOnClickListener { viewModel.clickOnLed(LedControllerViewModel.BLUE_LED) }
+        redLed.setOnClickListener { viewModel.clickOnLed(com.vovan.diplomaapp.presentation.ledController.Color.RED) }
+        greenLed.setOnClickListener { viewModel.clickOnLed(com.vovan.diplomaapp.presentation.ledController.Color.GREEN) }
+        blueLed.setOnClickListener { viewModel.clickOnLed(com.vovan.diplomaapp.presentation.ledController.Color.BLUE) }
 
         viewModel.connectionState.observe(viewLifecycleOwner) { processConnectionState(it) }
         viewModel.dataState.observe(viewLifecycleOwner) { processDataState(it) }
-        viewModel.eventState.observe(viewLifecycleOwner) { processEventState(it) }
     }
 
     private fun processConnectionState(state: SensorsConnectionState) = with(binding) {
@@ -84,23 +83,6 @@ class LedControllerFragment : Fragment() {
 
     private fun processDataState(state: SensorDataState<List<Boolean>>) {
         setColors(state.data)
-    }
-
-    private fun processEventState(state: BackgroundInfoEventState) {
-        when(state){
-            is BackgroundInfoEventState.Success<*> -> {
-                AlertDialog.Builder(requireContext())
-                    .setTitle("Last update...")
-                    .setMessage("Your last offline update was successfully completed [${state.data}]")
-                    .create().show()
-            }
-            else -> {
-                AlertDialog.Builder(requireContext())
-                    .setTitle("Last update...")
-                    .setMessage("Something went wrong with your changes")
-                    .create().show()
-            }
-        }
     }
 
     private fun setColors(data: List<Boolean>) = with(binding){

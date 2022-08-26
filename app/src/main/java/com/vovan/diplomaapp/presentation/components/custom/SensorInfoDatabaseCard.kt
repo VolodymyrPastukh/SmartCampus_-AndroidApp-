@@ -1,6 +1,7 @@
 package com.vovan.diplomaapp.presentation.components.custom
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,7 +19,8 @@ fun SensorInfoDatabaseCard(data: SensorsEntity) {
     ElevatedBox(
         modifier = Modifier
             .fillMaxSize(),
-        elevation = 12
+        elevation = 12,
+        shape = RoundedCornerShape(topStart = 20.dp, bottomStart = 20.dp)
     ) {
         Row(
             modifier = Modifier
