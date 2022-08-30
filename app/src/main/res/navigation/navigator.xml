@@ -2,37 +2,4 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/navigator"
-    app:startDestination="@id/titleFragment">
-
-    <fragment
-        android:id="@+id/titleFragment"
-        android:name="com.vovan.diplomaapp.presentation.TitleFragment"
-        android:label="fragment_title"
-        tools:layout="@layout/fragment_title" >
-        <action
-            android:id="@+id/action_titleFragment_to_dataFragment"
-            app:destination="@id/dataFragment" />
-        <action
-            android:id="@+id/action_titleFragment_to_ledControllerFragment"
-            app:destination="@id/ledControllerFragment" />
-        <action
-            android:id="@+id/action_titleFragment_to_sensorsDataList"
-            app:destination="@id/sensorsDataList" />
-    </fragment>
-    <fragment
-        android:id="@+id/dataFragment"
-        android:name="com.vovan.diplomaapp.presentation.sensors.SensorsFragment"
-        android:label="fragment_data"
-        tools:layout="@layout/fragment_sensors" />
-    <fragment
-        android:id="@+id/ledControllerFragment"
-        android:name="com.vovan.diplomaapp.presentation.ledController.LedControllerFragment"
-        android:label="fragment_led_controller"
-        tools:layout="@layout/fragment_led_controller" />
-    <fragment
-        android:id="@+id/sensorsDataList"
-        android:name="com.vovan.diplomaapp.presentation.sensorsList.SensorsDataListFragment"
-        android:label="fragment_sensors_data_list"
-        tools:layout="@layout/fragment_sensors_data_list" />
-</navigation>
+    android:id="@+id/navigator" />
